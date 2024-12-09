@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "sls",
+        "SourceDest": "sap",
+        "Environment": "tst",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "i-exchangeraterawdata-tcurr",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

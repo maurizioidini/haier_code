@@ -1,0 +1,31 @@
+{
+    "Parameters": {
+        "Domain": "sls",
+        "SourceSystem": "sap",
+        "SourceBucketName": "sls-sap-prd-ing-raw-zww-ftm-i-paymentterms-t052",
+        "DataTypeSource": "raw",
+        "DataTypeTarget": "rel",
+        "TargetSchemaName": "mtd",
+        "TargetTableName": "sap_dm_zww_ftm_i_paymentterms_t052",
+        "Description": "",
+        "NumberOfWorkers": "2",
+        "WorkerType": "G.1X",
+        "ExecutionClass": "STANDARD",
+        "ClusterIdentifier": "haier-dwh-prod-redshift-1",
+        "RedshiftConnection": "redshift",
+        "DbUser": "dwh_user",
+        "DbName": "dwhprod",
+        "RedshiftTmpDir": "s3://aws-glue-assets-975942111920-eu-west-1/temporary/",
+        "DriverJdbc": "jdbc:redshift",
+        "Host": "haier-dwh-prod-redshift-1.cs87oo23jhau.eu-west-1.redshift.amazonaws.com",
+        "Port": "5439",
+        "Region": "eu-west-1",
+        "Mode": "Full",
+        "Pkey": "PaymentTerms,ZTAGG",
+        "SupplierTag": "spx",
+        "JobRole": "arn:aws:iam::975942111920:role/dp-sls-sales-glue-role-prod",
+        "ScriptLocation": "s3://glue-code-dependencies-prod/glue-scripts/dp-sls-sales/dp-sls-sales-glue-job.py",
+        "EnvironmentTag": "prd",
+        "IncrementalField": "<EMPTY>"
+    }
+}

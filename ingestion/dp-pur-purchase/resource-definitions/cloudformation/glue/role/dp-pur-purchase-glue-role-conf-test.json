@@ -1,0 +1,6 @@
+{
+    "Parameters": {
+        "Name": "pur-purchase",
+        "Environment": "test"
+    }
+}

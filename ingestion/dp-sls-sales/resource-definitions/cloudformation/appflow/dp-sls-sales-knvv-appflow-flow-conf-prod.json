@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview knvv",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-ptp-knvv",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-zww-ptp-knvv",
+        "Object": "/sap/opu/odata/sap/ZAWS_CUSTOMER_SRV/ZWW_PTP_KNVV",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vbbe",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-vbbe",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-zww-otc-vbbe",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/ZWW_OTC_VBBE",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}

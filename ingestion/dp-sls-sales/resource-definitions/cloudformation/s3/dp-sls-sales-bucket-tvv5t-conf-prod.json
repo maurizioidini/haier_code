@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "sls",
+        "SourceDest": "sap",
+        "Environment": "prd",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "i-additionalcustomergroup5text-tvv5t",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

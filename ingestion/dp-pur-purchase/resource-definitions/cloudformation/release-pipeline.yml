@@ -1,0 +1,452 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+
+Mappings:
+  EnvMap:
+    test:
+      AccountNumber: '592141405271'
+    prod:
+      AccountNumber: '975942111920'
+
+Resources:
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub 'dp-pur-purchase-pipeline-${Environment}'
+      RoleArn: arn:aws:iam::590184051506:role/pa-pipeline-role-cicd
+      ArtifactStore:
+        EncryptionKey:
+          Id: arn:aws:kms:eu-west-1:590184051506:key/62068e0a-9828-4961-a5cc-8e4ee2c93f12
+          Type: KMS
+        Location: codepipeline-encrypted-artifacts
+        Type: S3
+      PipelineType: V1
+      RestartExecutionOnUpdate: false
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceCodeCommit
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit
+                Version: 1
+              Configuration:
+                RepositoryName: dp-pur-purchase
+                BranchName: !Ref Environment
+                PollForSourceChanges: false
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: eu-west-1
+              RunOrder: 1
+
+        - Name: DeployBucket
+          Actions:
+            - Name: DeployBucketLfa1
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-lfa1-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-pur-purchase-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-pur-purchase-bucket-lfa1-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployBucketT173t
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-t173t-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-pur-purchase-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-pur-purchase-bucket-t173t-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+        - Name: DeployAppflowFlow
+          Actions:
+            - Name: DeployAppflowLfa1
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-appflow-lfa1-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-lfa1-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowT173t
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-appflow-t173t-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-t173t-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowEkbe
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-appflow-ekbe-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-appflow-flows_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-ekbe-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowEkko
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-appflow-ekko-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-appflow-flows_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-ekko-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowEkpo
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-appflow-ekpo-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-appflow-flows_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-pur-purchase-ekpo-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+        - Name: DeployGlue
+          Actions:
+            - Name: DeployGlueRole
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-glue-role-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/role/dp-pur-purchase-glue-role.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/role/dp-pur-purchase-glue-role-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployGlueJobLfa1
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-glue-job-lfa1-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-lfa1-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobEkbe
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-glue-job-ekbe-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-glue-jobs_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-ekbe-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobEkko
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-glue-job-ekko-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-glue-jobs_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-ekko-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobEkpo
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-glue-job-ekpo-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-glue-jobs_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-ekpo-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobT173t
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-glue-job-t173t-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pur-purchase-t173t-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployWorkflow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pur-purchase-glue-workflow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-pur-purchase-glue-workflow.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-pur-purchase-glue-workflow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 3
+
+        - Name: DeployLambda
+          Actions:
+            - Name: DeployLambdaFunction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_AUTO_EXPAND
+                RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+                StackName: !Sub dp-pur-purchase-lambda-functions-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-pur-purchase-lambda-functions.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-pur-purchase-lambda-functions-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              RunOrder: 1
+        - Name: ExecuteLambda
+          Actions:
+            - Name: InvokeLambdaFunction
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Provider: Lambda
+                Version: 1
+              Configuration:
+                FunctionName: !Sub pur-purchase-move-glue-scripts-to-s3-${Environment}
+              InputArtifacts: []
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn: arn:aws:iam::590184051506:role/svc-lambda-role-cicd
+              RunOrder: 1

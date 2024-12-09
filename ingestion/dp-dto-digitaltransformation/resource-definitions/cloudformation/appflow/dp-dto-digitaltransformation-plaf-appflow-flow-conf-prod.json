@@ -1,0 +1,18 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview plaf",
+        "DomainName": "dto",
+        "SourceName": "sap",
+        "SourceObject": "zww-i-plannerorder-cust-plaf",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "dto-digitaltransformation",
+        "Environment": "prd",
+        "BucketName": "data",
+        "Object": "/sap/opu/odata/sap/ZAWS_PLANNING_SRV/ZWW_I_PLANNEDORDER_CUST",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "fin",
+        "SourceDest": "sap",
+        "Environment": "tst",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "cutoff-date",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

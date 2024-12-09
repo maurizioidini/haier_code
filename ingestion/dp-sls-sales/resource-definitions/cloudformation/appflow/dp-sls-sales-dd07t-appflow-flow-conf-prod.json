@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview dd07t",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-cat-i-domainfixedvaluetext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-zww-cat-i-domainfixedvaluetext-dd07t",
+        "Object": "/sap/opu/odata/sap/ZAWS_GENERAL_SRV/ZWW_CAT_I_DomainFixedValueText",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

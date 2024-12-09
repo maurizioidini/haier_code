@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ''
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+  Name:
+    Type: String
+    Description: 'The name of the data product'
+
+Resources:
+  GlueRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'dp-${Name}-glue-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'glue.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'glue-custom-policy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - 's3:*'
+                  - 'athena:*'
+                  - 'glue:*'
+                  - 'lambda:*'
+                  - 'ec2:*'
+                  - 'redshift:*'
+                  - 'redshift-data:*'
+                  - 'sts:AssumeRole'
+                  - 'logs:*'
+                  - 'ssm:GetParameter'
+                  - 'ssm:GetParameters'
+                  - 'ssm:GetParameterHistory'
+                  - 'ssm:GetParametersByPath'
+                Resource: '*'
+                Effect: 'Allow'

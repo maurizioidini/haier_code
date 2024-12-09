@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Domain:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, eco, fin, hre, iot, mat, pla, pro, pur, sls]
+  DataProduct:
+    Type: String
+  Environment:
+    Type: String
+    Description: Specifies the environment of the trigger
+    AllowedValues: [test, prod]
+  StartLayer:
+    Type: String
+  Frequency:
+    Type: String
+  SourceAlignedTable:
+    Type: String
+
+
+
+Resources:
+  PrcdBdInitialLoadWorkflow:
+    Type: AWS::Glue::Workflow
+    Properties:
+      Description: !Sub "Workflow for ${SourceAlignedTable}"
+      MaxConcurrentRuns: 10
+      Name: !Sub "${Domain}_${DataProduct}_from_${StartLayer}_${Frequency}_${SourceAlignedTable}_${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  PrcdBdInitialLoadWorkflowTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: EVENT
+      EventBatchingCondition:
+        BatchSize: 1
+      Actions:
+        - JobName: !Sub '${Domain}_${DataProduct}_${SourceAlignedTable}'
+      Name: !Sub '${Domain}_${DataProduct}_start_trg_${SourceAlignedTable}_${Environment}'
+      WorkflowName: !Sub "${Domain}_${DataProduct}_from_${StartLayer}_${Frequency}_${SourceAlignedTable}_${Environment}"
+      Tags:
+        Supplier: "Spindox"

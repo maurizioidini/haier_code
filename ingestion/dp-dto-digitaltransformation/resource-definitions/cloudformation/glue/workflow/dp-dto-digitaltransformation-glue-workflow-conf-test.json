@@ -1,0 +1,14 @@
+{
+  "Parameters": {
+      "Domain": "dto",
+      "DataProduct": "digitaltransformation",
+      "Environment": "test",
+      "ScheduleCron": "cron(20 4 ? * * *)",
+      "Job1" : "dto_sap_from_dto-sap-tst-ing-raw-zww-cat-aws-i-chdocitem-cust-cdpos_raw_to_rel_sap_dto_ft_zww_cat_aws_i_chdocitem_cust_cdpos",
+      "Job2" : "dto_sap_from_dto-sap-tst-ing-raw-i-dfs-orglmeasurechangedoc-cdhdr_raw_to_rel_sap_dto_ft_i_dfs_orglmeasurechangedoc_cdhdr",
+      "Job3" : "dto_sap_from_dto-sap-tst-ing-raw-i-companycode-t001_raw_to_rel_sap_dm_i_companycode_t001",
+      "Job4" : "dto_sap_from_zww-i-plannerorder-cust-plaf_raw_to_rel_sap_dto_ft_zww_i_plannedorder_cust_plaf",
+      "Job5" : "dto_sap_from_i-companycode-t001_raw_to_rel_sap_dm_i_companycode_t001"
+  }
+}
+

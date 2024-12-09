@@ -1,0 +1,22 @@
+{
+    "Parameters": {
+        "Domain": "sls",
+        "DataProduct" : "sales",
+        "TargetTableName": "prcd-elements-bd-initial-load",
+        "FilterField": "kdatu",
+        "IntervalStartDate": "2024-01-01",
+        "IntervalEndDate": "2024-01-08",
+        "Granularity": "day",
+        "DeltaGranularity" : "1",
+        "SourceSystem": "sap",
+        "EnvironmentTag": "prd",
+        "ScriptLocation": "s3://glue-code-dependencies-prod/glue-scripts/dp-sls-sales/initial_load_batch_from_sap.py",
+        "NumberOfWorkers": "0",
+        "WorkerType": "0",
+        "JobType": "pythonshell",
+        "JobRole": "arn:aws:iam::975942111920:role/dp-sls-sales-glue-role-prod",
+        "ExecutionClass": "STANDARD",
+        "SupplierTag": "Spindox"
+    }
+}
+

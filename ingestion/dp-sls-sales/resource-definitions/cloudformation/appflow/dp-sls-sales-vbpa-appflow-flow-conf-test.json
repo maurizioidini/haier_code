@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vbpa",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-aws-sdcompp-cust-sod",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-zww-otc-aws-sdcompp-cust-sod-vbpa",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/ZWW_OTC_AWS_SDCOMPP_CUST_SOD",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "IncrementalField": "DeltaDate",
+        "ScheduleCron": "cron(50 1 ? * * *)"
+    }
+}

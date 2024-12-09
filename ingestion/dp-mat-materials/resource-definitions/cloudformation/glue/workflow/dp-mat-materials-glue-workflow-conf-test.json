@@ -1,0 +1,16 @@
+{
+  "Parameters": {
+      "Domain": "mat",
+      "DataProduct": "materials",
+      "Environment": "test",
+      "ScheduleCron": "cron(30 3 ? * * *)",
+      "Job1" : "mat_sap_from_mat-sap-tst-ing-raw-zww-ptp-nsdm-e-mardh_raw_to_rel_sap_mat_ft_zww_ptp_nsdm_e_mardh",
+      "Job2" : "mat_sap_from_mat-sap-tst-ing-raw-zww-ptp-nsdm-e-mkol_raw_to_rel_sap_mat_ft_zww_ptp_nsdm_e_mkol",
+      "Job3" : "mat_sap_from_mat-sap-tst-ing-raw-i-producthierarchytext-t179t_raw_to_rel_sap_dm_i_producthierarchytext_t179t",
+      "Job4" : "mat_sap_from_zww-ptp-cabn-cabn_raw_to_rel_sap_dm_zww_ptp_cabn_cabn",
+      "Job5" : "mat_sap_from_zww-ptp-ausp-ausp_raw_to_rel_sap_dm_zww_ptp_ausp_ausp",
+      "Job6" : "mat_sap_from_zww-ptp-nsdm-e-mseg_raw_to_rel_sap_mat_ft_zww_ptp_nsdm_e_mseg_mseg",
+      "Job7" : "mat_sap_from_i-product_raw_to_rel_sap_dm_i_product_mara",
+      "Job8" : "mat_sap_from_default_la_storage_location_raw_to_rel_default_la_storage_location"
+  }
+}

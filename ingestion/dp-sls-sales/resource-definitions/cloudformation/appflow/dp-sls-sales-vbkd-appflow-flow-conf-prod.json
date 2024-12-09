@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vbkd",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-vbkd",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-zww-otc-vbkd",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/ZWW_OTC_VBKD",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "IncrementalField": "ChangeDate",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

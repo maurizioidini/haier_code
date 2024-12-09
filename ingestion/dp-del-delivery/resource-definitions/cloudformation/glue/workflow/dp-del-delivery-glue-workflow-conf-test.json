@@ -1,0 +1,15 @@
+{
+  "Parameters": {
+      "Domain": "del",
+      "DataProduct": "delivery",
+      "Environment": "test",
+      "ScheduleCron": "cron(10 4 ? * * *)",
+      "Job1" : "del_sap_from_del-sap-tst-ing-raw-zww-otc-aws-i-deliverydoc-cust-likp_raw_to_rel_sap_del_ft_zww_otc_aws_i_deliverydoc_cust_likp",
+      "Job2" : "del_sap_from_del-sap-tst-ing-raw-zww-dts-aws-shipment-vttk_raw_to_rel_sap_del_ft_zww_dts_aws_shipment_vttk",
+      "Job3" : "del_sap_from_del-sap-tst-ing-raw-i-deliverydocumenttypetext-tvlkt_raw_to_rel_sap_dm_i_deliverydocumenttypetext_tvlkt",
+      "Job4" : "del_sap_from_del-sap-tst-ing-raw-i-deliveryblockreasontext-tvlst_raw_to_rel_sap_dm_i_deliveryblockreasontext_tvlst",
+      "Job5" : "del_sap_from_del-sap-tst-ing-raw-i-routetext-tvrot_raw_to_rel_sap_dm_i_routetext_tvrot",
+      "Job6" : "del_sap_from_del-sap-tst-ing-raw-zww-otc-aws-i-delidocitem-cust-lips_raw_to_rel_sap_del_ft_zww_otc_aws_i_delidocitem_cust_lips",
+      "Job7" : "del_sap_from_del-sap-tst-ing-raw-zww-otc-aws-shipment-item-vttp_raw_to_rel_sap_del_ft_zww_otc_aws_shipment_item_vttp"
+  }
+}

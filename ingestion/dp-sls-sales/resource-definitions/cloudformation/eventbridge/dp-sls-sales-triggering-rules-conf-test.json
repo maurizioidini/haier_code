@@ -1,0 +1,13 @@
+{
+    "Parameters": {
+        "Environment": "test",
+        "EnvironmentTag": "tst",
+        "Domain": "sls",
+        "DataProduct": "sales",
+
+        "DescriptiveName1": "prcd-bd-initial-load",
+        "WorkflowName1": "sls_sales_from_ing_occ_prcd-elements-bd-initial-load_test",
+        "Flow1": "sls-from-sap-prcd-elements-bd-initial-load-to-s3-ing-data"
+
+    }
+}

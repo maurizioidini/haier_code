@@ -1,0 +1,31 @@
+{
+    "Parameters": {
+        "Domain": "sls",
+        "SourceSystem": "sap",
+        "SourceBucketName": "sls-sap-tst-ing-raw-zww-otc-i-sddocmultlvlprocflow-vbfa",
+        "DataTypeSource": "raw",
+        "DataTypeTarget": "rel",
+        "TargetSchemaName": "dwa",
+        "TargetTableName": "sap_sls_ft_zww_otc_i_sddocmultlvlprocflow_vbfa",
+        "Description": "",
+        "NumberOfWorkers": "16",
+        "WorkerType": "G.1X",
+        "ExecutionClass": "STANDARD",
+        "ClusterIdentifier": "haier-dwh-test-redshift-1",
+        "RedshiftConnection": "redshift-connection-test",
+        "DbUser": "dwh_user",
+        "DbName": "dwhtest",
+        "RedshiftTmpDir": "s3://aws-glue-assets-592141405271-eu-west-1/temporary/",
+        "DriverJdbc": "jdbc:redshift",
+        "Host": "haier-dwh-test-redshift-1.csbqoeassujt.eu-west-1.redshift.amazonaws.com",
+        "Port": "5439",
+        "Region": "eu-west-1",
+        "Mode": "Delta",
+        "Pkey": "PrecedingDocument,PrecedingDocumentItem,SubsequentDocument,SubsequentDocumentItem,SubsequentDocumentCategory",
+        "SupplierTag": "spx",
+        "JobRole": "arn:aws:iam::592141405271:role/dp-sls-sales-glue-role-test",
+        "ScriptLocation": "s3://glue-code-dependencies-test/glue-scripts/dp-sls-sales/dp-sls-sales-glue-job.py",
+        "EnvironmentTag": "tst",
+        "IncrementalField": "LastChangeDate"
+    }
+}

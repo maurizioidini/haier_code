@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview mardh",
+        "DomainName": "mat",
+        "SourceName": "sap",
+        "SourceObject": "zww-ptp-nsdm-e-mardh",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "mat-sap-tst-ing-raw-zww-ptp-nsdm-e-mardh",
+        "Object": "/sap/opu/odata/sap/ZAWS_INVENTORY_SRV/ZWW_PTP_nsdm_e_mardh",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

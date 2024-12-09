@@ -1,0 +1,392 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+
+Mappings:
+  EnvMap:
+    test:
+      AccountNumber: '592141405271'
+    prod:
+      AccountNumber: '975942111920'
+
+Resources:
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub 'dp-bil-billing-pipeline-${Environment}'
+      RoleArn: arn:aws:iam::590184051506:role/pa-pipeline-role-cicd
+      ArtifactStore:
+        EncryptionKey:
+          Id: arn:aws:kms:eu-west-1:590184051506:key/62068e0a-9828-4961-a5cc-8e4ee2c93f12
+          Type: KMS
+        Location: codepipeline-encrypted-artifacts
+        Type: S3
+      PipelineType: V1
+      RestartExecutionOnUpdate: false
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceCodeCommit
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit
+                Version: 1
+              Configuration:
+                RepositoryName: dp-bil-billing
+                BranchName: !Ref Environment
+                PollForSourceChanges: false
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: eu-west-1
+              RunOrder: 1
+
+        - Name: DeployBucket
+          Actions:
+            - Name: DeployBucketTvfkt
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-tvfkt-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-bil-billing-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-bil-billing-bucket-tvfkt-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployBucketVbrk
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-vbrk-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-bil-billing-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-bil-billing-bucket-vbrk-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployBucketVbrp
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-vbrp-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-bil-billing-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-bil-billing-bucket-vbrp-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+
+        - Name: DeployAppflowFlow
+          Actions:
+            # - Name: DeployAppflowTvfkt
+            #   ActionTypeId:
+            #     Category: Deploy
+            #     Owner: AWS
+            #     Provider: CloudFormation
+            #     Version: 1
+            #   Configuration:
+            #     ActionMode: CREATE_UPDATE
+            #     Capabilities: CAPABILITY_IAM
+            #     RoleArn:
+            #       Fn::Sub:
+            #         - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+            #         - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+            #     StackName: !Sub dp-bil-billing-appflow-tvfkt-flow-${Environment}
+            #     TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-bil-billing-appflow-flows.yml
+            #     TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-bil-billing-tvfkt-appflow-flow-conf-${Environment}.json
+            #   InputArtifacts:
+            #     - Name: SourceArtifact
+            #   OutputArtifacts: []
+            #   Region: eu-west-1
+            #   RoleArn:
+            #     Fn::Sub:
+            #       - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+            #       - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+            #   RunOrder: 1
+
+            - Name: DeployAppflowVbrk
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-appflow-vbrk-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-bil-billing-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-bil-billing-vbrk-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowVbrp
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-appflow-vbrp-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-bil-billing-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-bil-billing-vbrp-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+        # - Name: DeployRedshiftTable
+        #   Actions:
+        #     - Name: DeployRedshiftTable
+        #       ActionTypeId:
+        #         Category: Build
+        #         Owner: AWS
+        #         Provider: CodeBuild
+        #         Version: 1
+        #       Configuration:
+        #         ProjectName: !Sub ip-codebuild-project-${Environment}
+        #       InputArtifacts:
+        #         - Name: SourceArtifact
+        #       OutputArtifacts:
+        #         - Name: BuildOutput
+        #       Region: eu-west-1
+        #       RunOrder: 1
+
+        - Name: DeployGlue
+          Actions:
+            - Name: DeployGlueRole
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-glue-role-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/role/dp-bil-billing-glue-role.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/role/dp-bil-billing-glue-role-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployGlueJobTvfktFlow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-glue-job-tvfkt-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-bil-billing-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-bil-billing-tvfkt-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobVbrkFlow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-glue-job-vbrk-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-bil-billing-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-bil-billing-vbrk-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobVbrpFlow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-glue-job-vbrp-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-bil-billing-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-bil-billing-vbrp-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployWorkflow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-bil-billing-glue-workflow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-bil-billing-glue-workflow.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-bil-billing-glue-workflow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 3
+
+        - Name: DeployLambda
+          Actions:
+            - Name: DeployLambdaFunction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_AUTO_EXPAND
+                RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+                StackName: !Sub dp-bil-billing-lambda-functions-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-bil-billing-lambda-functions.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-bil-billing-lambda-functions-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              RunOrder: 1
+        - Name: ExecuteLambda
+          Actions:
+            - Name: InvokeLambdaFunction
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Provider: Lambda
+                Version: 1
+              Configuration:
+                FunctionName: !Sub bil-billing-move-glue-scripts-to-s3-${Environment}
+              InputArtifacts: []
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn: arn:aws:iam::590184051506:role/svc-lambda-role-cicd
+              RunOrder: 1

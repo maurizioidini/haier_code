@@ -1,0 +1,555 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+
+Mappings:
+  EnvMap:
+    test:
+      AccountNumber: '592141405271'
+    prod:
+      AccountNumber: '975942111920'
+
+Resources:
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub 'dp-qlik-reporting-pipeline-${Environment}'
+      RoleArn: arn:aws:iam::590184051506:role/pa-pipeline-role-cicd
+      ArtifactStore:
+        EncryptionKey:
+          Id: arn:aws:kms:eu-west-1:590184051506:key/62068e0a-9828-4961-a5cc-8e4ee2c93f12
+          Type: KMS
+        Location: codepipeline-encrypted-artifacts
+        Type: S3
+      PipelineType: V1
+      RestartExecutionOnUpdate: false
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceCodeCommit
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit
+                Version: 1
+              Configuration:
+                RepositoryName: dp-qlik-reporting
+                BranchName: !Ref Environment
+                PollForSourceChanges: false
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: eu-west-1
+              RunOrder: 1
+
+        - Name: DeployBucket
+          Actions:
+            - Name: DeployBucketReporting
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-qlik-reporting-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-qlik-reporting-bucket-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployBucketMaterialData
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-data-pro-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-mat-data-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-mat-data-bucket-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+        - Name: DeployGlue
+          Actions:
+            - Name: DeployGlueRole
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-role-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/role/dp-qlik-reporting-glue-role.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/role/dp-qlik-reporting-glue-role-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployGlueJobManMappingAreaDesc
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-man-mat-area-desc-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-man-mat-area-desc-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobPlmModel
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-model-glue-job-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-model-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobPlaScp
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pla-scp-glue-job-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pla-scp-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobPbcs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-pbcs-cost-glue-job-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-pbcs-cost-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobBronze
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-bronze-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-bronze-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobMapping
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-mapping-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-mapping-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobOrdGs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-ord-gs-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-ord-gs-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobInvGs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-inv-gs-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-inv-gs-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobDelGs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-del-gs-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-del-gs-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobCasGs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-cas-gs-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-cas-gs-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobSalesAnalysisHetlAnagrafiche
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-salesanalysis-hetlanagrafiche-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-salesanalysis-hetlanagrafiche-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobHetl2Gs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-salesanalysis-hetl2-gs-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-hetl2-gs-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobSalesAnalysisHetl3Gs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-salesanalysis-hetl3-gs-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-salesanalysis-hetl3-gs-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobPortfolioDetailGs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-job-portfolio-detail-gs-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-qlik-reporting-portfolio-detail-gs-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployWorkflow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-qlik-reporting-glue-workflow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-qlik-reporting-glue-workflow.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-qlik-reporting-glue-workflow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 3
+
+
+        - Name: DeployLambda
+          Actions:
+            - Name: DeployLambdaFunction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_AUTO_EXPAND
+                RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+                StackName: !Sub dp-qlik-reporting-lambda-functions-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-qlik-reporting-lambda-functions.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-qlik-reporting-lambda-functions-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              RunOrder: 1
+        - Name: ExecuteLambda
+          Actions:
+            - Name: InvokeLambdaFunction
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Provider: Lambda
+                Version: 1
+              Configuration:
+                FunctionName: !Sub qlik-reporting-move-glue-scripts-to-s3-${Environment}
+              InputArtifacts: []
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn: arn:aws:iam::590184051506:role/svc-lambda-role-cicd
+              RunOrder: 1

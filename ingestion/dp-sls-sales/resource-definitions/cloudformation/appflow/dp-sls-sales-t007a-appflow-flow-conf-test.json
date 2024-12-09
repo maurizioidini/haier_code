@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview t007a",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-ftm-i-taxcode",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-zww-ftm-i-taxcode-t007a",
+        "Object": "/sap/opu/odata/sap/ZAWS_ACCOUNTING_SRV/ZWW_FTM_I_TaxCode",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

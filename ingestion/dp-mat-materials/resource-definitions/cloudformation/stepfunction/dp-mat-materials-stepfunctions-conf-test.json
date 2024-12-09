@@ -1,0 +1,10 @@
+{
+  "Parameters": {
+      "Environment": "test",
+      "LambdaCheckName": "dp-mat-materials-check-appflow-lambda-test",
+      "LambdaStartName": "dp-mat-materials-start-appflow-lambda-test",
+      "WorkflowName": "dp-mat-materials-glue-workflow-test",
+      "AppFlow1":"mat-from-sap-i-producthierarchytext-to-s3-ing-mat-sap-tst-ing-raw-i-producthierarchytext-t179t",
+      "AppFlow2":"mat-from-sap-zww-ptp-ausp-ausp-to-s3-ing-data"
+  }
+}

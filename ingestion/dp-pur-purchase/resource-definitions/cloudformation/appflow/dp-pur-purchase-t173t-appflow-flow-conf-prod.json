@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview t173t",
+        "DomainName": "pur",
+        "SourceName": "sap",
+        "SourceObject": "i-shippingtypetext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "pur-sap-prd-ing-raw-i-shippingtypetext-t173t",
+        "Object": "/sap/opu/odata/sap/ZAWS_PURCHASEORDERS_SRV/I_ShippingTypeText",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

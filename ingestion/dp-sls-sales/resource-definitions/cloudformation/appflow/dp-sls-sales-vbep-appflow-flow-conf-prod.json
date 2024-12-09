@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vbep",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-salesdocumentscheduleline",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-i-salesdocumentscheduleline-vbep",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/I_SalesDocumentScheduleLine",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

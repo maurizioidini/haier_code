@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview cdpos",
+        "DomainName": "dto",
+        "SourceName": "sap",
+        "SourceObject": "zww-cat-aws-i-chdocitem-cust",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "dto-sap-tst-ing-raw-zww-cat-aws-i-chdocitem-cust-cdpos",
+        "Object": "/sap/opu/odata/sap/ZAWS_CHANGEDOCUMENT_SRV/ZWW_CAT_AWS_I_CHDOCITEM_CUST",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "IncrementalField": "CreationDate",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  FlowDescription:
+    Type: String
+  #Name
+  DomainName:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, fin, hre, iot, mat, pla, pro, pur, sls]
+    ConstraintDescription: Must insert one of the allowed values
+  SourceName:
+    Type: String
+    AllowedValues: [ago, cpm, hqd, hon, scp, qlk, slf, sap, tms, sno, sie]
+    ConstraintDescription: Must insert one of the allowed values
+  SourceObject:
+    Type: String
+    Description: Name of the Salesforce/Sap/ServiceNow object
+  ServiceName:
+    Type: String
+    AllowedValues: [s3, rds]
+    ConstraintDescription: Must insert one of the allowed values
+  LayerName:
+    Type: String
+    AllowedValues: [ing, pro, rea]
+    ConstraintDescription: Must insert ing for ingress, pro for process, rea for readable
+  BucketName:
+    Type: String
+    Description: The name of the S3 bucket where the data will be written
+
+  Object:
+    Type: String
+  ConnectorProfileName:
+    Type: String
+
+  ConnectionType:
+    Type: String
+    AllowedValues: [Servicenow, SAPOData, Salesforce]
+    Description: Type of source connection
+
+  DataTransferApi:
+    Type: String
+    AllowedValues: [AUTOMATIC, BULKV2, REST_SYNC, '']
+    Default: AUTOMATIC
+    Description: (Salesforce Only) Which API is used to transfer data
+
+  IncrementalField:
+    Type: String
+    Default: ''
+    Description: Field used to incremental pull mode
+
+  ScheduleCron:
+    Type: String
+    Default: ''
+    Description: Cron schedule
+
+
+Conditions:
+  IsServiceNow: !Equals [ !Ref ConnectionType, Servicenow ]
+  IsSAPOData: !Equals [ !Ref ConnectionType, SAPOData ]
+  IsSalesforce: !Equals [ !Ref ConnectionType, Salesforce ]
+  IsIncremental: !Not [ !Equals [ !Ref IncrementalField, '' ] ]
+  IsScheduledTrigger: !Not [ !Equals [ !Ref ScheduleCron, '' ] ]
+
+Resources:
+  AppFlowJob:
+    Type: AWS::AppFlow::Flow
+    Properties:
+      FlowName:
+        Fn::Sub: '${DomainName}-from-${SourceName}-${SourceObject}-to-${ServiceName}-${LayerName}-${BucketName}'
+      Description: !Ref FlowDescription
+      DestinationFlowConfigList:
+        - ConnectorType: S3
+          DestinationConnectorProperties:
+            S3:
+              BucketName: !Ref BucketName
+              S3OutputFormatConfig:
+                AggregationConfig:
+                  AggregationType: None
+                  TargetFileSize: 128
+                FileType: PARQUET
+                PrefixConfig:
+                  PathPrefixHierarchy:
+                  - EXECUTION_ID
+                  PrefixFormat: DAY
+                  PrefixType: PATH
+                PreserveSourceDataTyping: true
+      SourceFlowConfig:
+        ConnectorProfileName: !Ref ConnectorProfileName
+        ConnectorType: !Ref ConnectionType
+        IncrementalPullConfig:
+          !If [ IsIncremental, DatetimeTypeFieldName: !Ref IncrementalField, !Ref 'AWS::NoValue']
+        SourceConnectorProperties:
+          SAPOData: !If [IsSAPOData, { ObjectPath: !Ref Object, paginationConfig: { maxPageSize: 3000 }, parallelismConfig: { maxParallelism: 3 } }, !Ref 'AWS::NoValue']
+          ServiceNow: !If [IsServiceNow, { Object: !Ref Object }, !Ref 'AWS::NoValue']
+          Salesforce: !If [IsSalesforce, { Object: !Ref Object, DataTransferApi: !Ref DataTransferApi }, !Ref 'AWS::NoValue']
+      FlowStatus: !If [IsScheduledTrigger, Active , !Ref 'AWS::NoValue']
+      Tasks:
+        - TaskType: Map_all
+          SourceFields: []
+          TaskProperties: []
+      #TriggerConfig:
+      #  TriggerType: OnDemand
+      TriggerConfig:
+        TriggerType: !If [ IsScheduledTrigger, Scheduled, OnDemand ]
+        TriggerProperties:
+          !If
+            - IsScheduledTrigger
+            - DataPullMode: !If [ IsIncremental, Incremental, Complete]
+              ScheduleExpression: !Ref ScheduleCron
+            - !Ref "AWS::NoValue"

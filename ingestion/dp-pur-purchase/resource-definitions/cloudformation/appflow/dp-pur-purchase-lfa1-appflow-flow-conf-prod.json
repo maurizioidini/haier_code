@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview lfa1",
+        "DomainName": "pur",
+        "SourceName": "sap",
+        "SourceObject": "i-supplier",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "pur-sap-prd-ing-raw-i-supplier-lfa1",
+        "Object": "/sap/opu/odata/sap/ZAWS_VENDOR_SRV/I_Supplier",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

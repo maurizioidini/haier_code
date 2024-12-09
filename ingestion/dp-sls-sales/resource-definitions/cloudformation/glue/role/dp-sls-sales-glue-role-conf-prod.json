@@ -1,0 +1,6 @@
+{
+    "Parameters": {
+        "Name": "sls-sales",
+        "Environment": "prod"
+    }
+}

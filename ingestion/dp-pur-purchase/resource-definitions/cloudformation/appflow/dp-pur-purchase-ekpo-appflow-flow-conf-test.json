@@ -1,0 +1,18 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview ekpo",
+        "DomainName": "pur",
+        "SourceName": "sap",
+        "SourceObject": "zww-ptp-aws-i-purdocitem-cust",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "pur-purchase",
+        "Environment": "tst",
+        "BucketName": "data",
+        "Object": "/sap/opu/odata/sap/ZAWS_PURCHASEORDERS_SRV/ZWW_PTP_AWS_I_PurcDocItem_CUST",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

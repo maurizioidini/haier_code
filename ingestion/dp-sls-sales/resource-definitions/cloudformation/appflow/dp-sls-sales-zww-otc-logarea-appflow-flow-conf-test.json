@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview zww-otc-logarea",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-logarea-cds",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-zww-otc-logarea-cds",
+        "Object": "/sap/opu/odata/sap/ZAWS_INVENTORY_SRV/ZWW_OTC_LOGAREA_CDS",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}

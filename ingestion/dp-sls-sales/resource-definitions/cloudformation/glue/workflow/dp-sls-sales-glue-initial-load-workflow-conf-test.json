@@ -1,0 +1,15 @@
+{
+  "Parameters": {
+      "Domain": "sls",
+      "DataProduct": "sales",
+      "Environment": "test",
+      "StartLayer": "ing",
+      "Frequency": "occ",
+      "SourceAlignedTable": "prcd-elements-bd-initial-load"
+    }
+}
+
+
+
+
+

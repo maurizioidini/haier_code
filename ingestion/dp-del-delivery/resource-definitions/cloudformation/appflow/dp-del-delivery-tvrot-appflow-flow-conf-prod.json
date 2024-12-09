@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tvrot",
+        "DomainName": "del",
+        "SourceName": "sap",
+        "SourceObject": "i-routetext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "del-sap-prd-ing-raw-i-routetext-tvrot",
+        "Object": "/sap/opu/odata/sap/ZAWS_DELIVERY_SRV/I_RouteText",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

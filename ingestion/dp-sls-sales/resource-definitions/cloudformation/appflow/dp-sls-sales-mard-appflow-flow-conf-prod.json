@@ -1,0 +1,19 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview mard",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-ptp-aws-i-prodstorloc-cust",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "sls-sales",
+        "BucketName": "data",
+        "Environment": "prd",
+        "Object": "/sap/opu/odata/sap/ZAWS_PRODUCT_SRV/ZWW_PTP_AWS_I_ProdStorLoc_CUST",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}
+

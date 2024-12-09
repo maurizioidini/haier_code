@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview twst",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-twst",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-zww-otc-twst",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALES_SRV/ZWW_OTC_TWST",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}

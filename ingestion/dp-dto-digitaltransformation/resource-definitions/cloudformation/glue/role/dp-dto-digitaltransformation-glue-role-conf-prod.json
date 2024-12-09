@@ -1,0 +1,6 @@
+{
+    "Parameters": {
+        "Name": "dto-digitaltransformation",
+        "Environment": "prod"
+    }
+}

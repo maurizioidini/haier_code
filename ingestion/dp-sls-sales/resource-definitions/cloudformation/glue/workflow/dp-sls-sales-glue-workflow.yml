@@ -1,0 +1,373 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Domain:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, eco, fin, hre, iot, mat, pla, pro, pur, sls]
+  DataProduct:
+    Type: String
+  Environment:
+    Type: String
+    Description: Specifies the environment of the trigger
+    AllowedValues: [test, prod]
+
+  # Job Glue
+  Job1:
+    Type: String
+  Job2:
+    Type: String
+  Job3:
+    Type: String
+  Job4:
+    Type: String
+  Job5:
+    Type: String
+  Job6:
+    Type: String
+  Job7:
+    Type: String
+  Job8:
+    Type: String
+  Job9:
+    Type: String
+  Job10:
+    Type: String
+  Job11:
+    Type: String
+  Job12:
+    Type: String
+  Job13:
+    Type: String
+  Job14:
+    Type: String
+  Job15:
+    Type: String
+  Job16:
+    Type: String
+  Job17:
+    Type: String
+  Job18:
+    Type: String
+  Job19:
+    Type: String
+  Job20:
+    Type: String
+  Job21:
+    Type: String
+  Job22:
+    Type: String
+  Job23:
+    Type: String
+  Job24:
+    Type: String
+  Job25:
+    Type: String
+  Job26:
+    Type: String
+  Job27:
+    Type: String
+  Job28:
+    Type: String
+  Job29:
+    Type: String
+  Job30:
+    Type: String
+  Job31:
+    Type: String
+  Job32:
+    Type: String
+  Job33:
+    Type: String
+  Job34:
+    Type: String
+  Job35:
+    Type: String
+  Job36:
+    Type: String
+  JobPrcdHeader:
+    Type: String
+  JobPrcdItem:
+    Type: String
+  JobPrcdInv:
+    Type: String
+  JobPrcdBd:
+    Type: String
+
+  ScheduleCron:
+    Type: String
+    Default: ''
+    Description: Cron schedule
+
+Conditions:
+  IsScheduled: !Not [ !Equals [ !Ref ScheduleCron, '' ] ]
+
+
+Resources:
+  SlsCdsviewWorkflow:
+    Type: AWS::Glue::Workflow
+    Properties:
+      Description: !Sub "dp-${Domain}-${DataProduct} ${Environment} workflow"
+      MaxConcurrentRuns: 1
+      Name: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+
+  StartTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type:
+        !If
+          - IsScheduled
+          - SCHEDULED
+          - ON_DEMAND
+      Schedule:
+        !If
+          - IsScheduled
+          - !Ref ScheduleCron
+          - !Ref 'AWS::NoValue'
+      StartOnCreation: true
+      Description: "sls-sales Start Trigger"
+      Actions:
+        - JobName: !Ref Job33
+        - JobName: !Ref Job34
+        - JobName: !Ref Job35
+        - JobName: !Ref Job36
+        - JobName: !Ref Job3
+        - JobName: !Ref Job4
+        - JobName: !Ref Job5
+        - JobName: !Ref JobPrcdHeader
+        - JobName: !Ref JobPrcdItem
+        - JobName: !Ref JobPrcdInv
+        - JobName: !Ref JobPrcdBd
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_start_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  StepTwoTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref Job33
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job34
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job35
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job36
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job3
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job4
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job5
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobPrcdHeader
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobPrcdItem
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobPrcdInv
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobPrcdBd
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow's Second Step Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref Job6
+        - JobName: !Ref Job7
+        - JobName: !Ref Job8
+        - JobName: !Ref Job9
+        - JobName: !Ref Job10
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_step_two_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  StepThreeTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref Job6
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job7
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job8
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job9
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job10
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow's third Step Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref Job11
+        - JobName: !Ref Job12
+        - JobName: !Ref Job13
+        - JobName: !Ref Job14
+        - JobName: !Ref Job15
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_step_three_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  StepFourTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref Job11
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job12
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job13
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job14
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job15
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow's fourth Step Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref Job16
+        - JobName: !Ref Job17
+        - JobName: !Ref Job18
+        - JobName: !Ref Job19
+        - JobName: !Ref Job20
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_step_four_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  StepFiveTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref Job16
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job17
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job18
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job19
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job20
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow's fifth Step Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref Job21
+        - JobName: !Ref Job22
+        - JobName: !Ref Job23
+        - JobName: !Ref Job24
+        - JobName: !Ref Job25
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_step_five_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  StepSixTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref Job21
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job22
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job23
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job24
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job25
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow's sixth Step Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref Job26
+        - JobName: !Ref Job27
+        - JobName: !Ref Job28
+        - JobName: !Ref Job29
+        - JobName: !Ref Job30
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_step_six_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  StepSevenTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref Job26
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job27
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job28
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job29
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref Job30
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow's seventh Step Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref Job31
+        - JobName: !Ref Job32
+        - JobName: !Ref Job1
+        - JobName: !Ref Job2
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_step_seven_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"

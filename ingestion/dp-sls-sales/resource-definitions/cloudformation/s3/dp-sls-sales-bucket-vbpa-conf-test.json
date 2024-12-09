@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "sls",
+        "SourceDest": "sap",
+        "Environment": "tst",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "zww-otc-aws-sdcompp-cust-sod-vbpa",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

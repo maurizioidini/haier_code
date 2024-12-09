@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vbak",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-salesdocument",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-i-salesdocument-vbak",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/I_SalesDocument",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "IncrementalField": "LastChangeDateTime",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

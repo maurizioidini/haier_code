@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview cdhdr",
+        "DomainName": "dto",
+        "SourceName": "sap",
+        "SourceObject": "i-companycode-t001",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "dto-sap-tst-ing-raw-i-companycode-t001",
+        "Object": "/sap/opu/odata/sap/ZAWS_COMPANY_SRV/I_CompanyCode",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

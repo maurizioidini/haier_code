@@ -1,0 +1,731 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+
+Mappings:
+  EnvMap:
+    test:
+      AccountNumber: '592141405271'
+    prod:
+      AccountNumber: '975942111920'
+
+Resources:
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub 'dp-mat-materials-pipeline-${Environment}'
+      RoleArn: arn:aws:iam::590184051506:role/pa-pipeline-role-cicd
+      ArtifactStore:
+        EncryptionKey:
+          Id: arn:aws:kms:eu-west-1:590184051506:key/62068e0a-9828-4961-a5cc-8e4ee2c93f12
+          Type: KMS
+        Location: codepipeline-encrypted-artifacts
+        Type: S3
+      PipelineType: V1
+      RestartExecutionOnUpdate: false
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceCodeCommit
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit
+                Version: 1
+              Configuration:
+                RepositoryName: dp-mat-materials
+                BranchName: !Ref Environment
+                PollForSourceChanges: false
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: eu-west-1
+              RunOrder: 1
+
+        - Name: DeployBucket
+          Actions:
+            - Name: DeployBucketMardh
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-mardh-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-mat-materials-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-mat-materials-bucket-mardh-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployBucketMkol
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-mkol-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-mat-materials-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-mat-materials-bucket-mkol-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployBucketT179t
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-t179t-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-mat-materials-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-mat-materials-bucket-t179t-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+        - Name: DeployAppflowFlow
+          Actions:
+            - Name: DeployAppflowMardh
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-appflow-mardh-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-mardh-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowMkol
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-appflow-mkol-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-mkol-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowAusp
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-appflow-ausp-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-appflow-flows_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-ausp-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowMara
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-appflow-mara-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-appflow-flows_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-mara-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowMseg
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-appflow-mseg-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-appflow-flows_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-mseg-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowCabn
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-appflow-cabn-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-appflow-flows_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-cabn-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowT179t
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-appflow-t179t-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-mat-materials-t179t-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+        - Name: DeployGlue
+          Actions:
+            - Name: DeployGlueRole
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-role-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/role/dp-mat-materials-glue-role.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/role/dp-mat-materials-glue-role-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployGlueJobMardh
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-job-mardh-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-mardh-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobMkol
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-job-mkol-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-mkol-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobAusp
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-job-ausp-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-glue-jobs_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-ausp-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobMara
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-job-mara-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-glue-jobs_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-mara-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobMseg
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-job-mseg-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-glue-jobs_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-mseg-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobCabn
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-job-cabn-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-glue-jobs_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-cabn-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobT179t
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-job-t179t-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-t179t-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobDefaultLaStorageLocation
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-job-storagelocation-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-glue-jobs_newpath.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-mat-materials-storagelocation-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployWorkflow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-glue-workflow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-mat-materials-glue-workflow.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-mat-materials-glue-workflow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 3
+
+        - Name: DeployLambda
+          Actions:
+            - Name: DeployLambdaRoleCICD
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+                RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+                # RoleArn:
+                #   Fn::Sub:
+                #     - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                #     - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-lambda-role-cicd
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-role-cicd.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-role-cicd-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              # RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+              # RoleArn:
+              #   Fn::Sub:
+              #     - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+              #     - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployLambdaRoleEnv
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-lambda-role-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-role.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-role-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployLambdaFunction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_AUTO_EXPAND
+                RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+                StackName: !Sub dp-mat-materials-lambda-functions-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-functions.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-functions-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              RunOrder: 3
+
+            - Name: DeployLambdaStepFunctionStartAppflow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-mat-materials-lambda-stepfunctions-start-appflow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-functions-stepfunction.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-functions-start-appflow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 4
+
+
+            - Name: DeployLambdaStepFunctionCheckAppflow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_AUTO_EXPAND
+                RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+                StackName: !Sub dp-mat-materials-lambda-stepfunctions-check-appflow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-functions-stepfunction.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-lambda-functions-check-appflow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 4
+
+        - Name: ExecuteLambda
+          Actions:
+            - Name: InvokeLambdaFunction
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Provider: Lambda
+                Version: 1
+              Configuration:
+                FunctionName: !Sub mat-materials-move-glue-scripts-to-s3-${Environment}
+              InputArtifacts: []
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn: arn:aws:iam::590184051506:role/svc-lambda-role-cicd
+              RunOrder: 1
+
+
+        - Name: DeployStepFunction
+          Actions:
+            - Name: DeployStateMachine
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_AUTO_EXPAND
+                RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+                StackName: !Sub dp-mat-materials-stepfunctions-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/stepfunction/dp-mat-materials-stepfunctions.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-mat-materials-stepfunctions-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              RunOrder: 1

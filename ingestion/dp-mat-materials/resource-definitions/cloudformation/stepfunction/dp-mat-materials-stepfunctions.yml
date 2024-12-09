@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Definition of the Step Function.
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+
+  LambdaCheckName:
+    Type: String
+
+  LambdaStartName:
+    Type: String
+
+  WorkflowName:
+    Type: String
+
+  AppFlow1:
+    Type: String
+  AppFlow2:
+    Type: String
+
+Resources:
+  StepFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - appflow:DescribeFlow
+                  - appflow:StartFlow
+                  - glue:StartWorkflowRun
+                Resource: "*"
+
+  StepFunctionDefinition:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      Name: "MyCustomStepFunction"  # Nome personalizzato della Step Function
+      RoleArn: !GetAtt StepFunctionRole.Arn
+      Definition:
+        StartAt: StartAppFlow
+        States:
+          StartAppFlow:
+            Type: Task
+            Resource: !Ref LambdaStartName
+            Next: CheckAppFlowStatus
+
+          CheckAppFlowStatus:
+            Type: Task
+            Resource: !Ref LambdaCheckName
+            Next: AreFlowsCompleted
+
+          AreFlowsCompleted:
+            Type: Choice
+            Choices:
+              - Variable: "$.status.all_completed"
+                BooleanEquals: true
+                Next: TriggerGlueWorkflow
+            Default: WaitBeforeRetry
+
+          WaitBeforeRetry:
+            Type: Wait
+            Seconds: 120
+            Next: CheckAppFlowStatus
+
+          TriggerGlueWorkflow:
+            Type: Task
+            Resource: arn:aws:states:::glue:startWorkflowRun
+            Parameters:
+              Name: !Ref WorkflowName
+            End: true
+
+  StepFunctionSchedule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: "rate(1 day)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt StepFunctionDefinition.Arn
+          Id: "StepFunctionTarget"
+          Input: !Sub |
+            {
+              "flow_ids": ["${AppFlow1}", "${AppFlow2}"]
+            }
+      RoleArn: !GetAtt StepFunctionRole.Arn

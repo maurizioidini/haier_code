@@ -1,0 +1,348 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+
+Mappings:
+  EnvMap:
+    test:
+      AccountNumber: '592141405271'
+    prod:
+      AccountNumber: '975942111920'
+
+Resources:
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub 'dp-fin-financial-pipeline-${Environment}'
+      RoleArn: arn:aws:iam::590184051506:role/pa-pipeline-role-cicd
+      ArtifactStore:
+        EncryptionKey:
+          Id: arn:aws:kms:eu-west-1:590184051506:key/62068e0a-9828-4961-a5cc-8e4ee2c93f12
+          Type: KMS
+        Location: codepipeline-encrypted-artifacts
+        Type: S3
+      PipelineType: V1
+      RestartExecutionOnUpdate: false
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceCodeCommit
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit
+                Version: 1
+              Configuration:
+                RepositoryName: dp-fin-financial
+                BranchName: !Ref Environment
+                PollForSourceChanges: false
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: eu-west-1
+              RunOrder: 1
+
+        - Name: DeployBucket
+          Actions:
+            - Name: DeployBucketBseg
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-bseg-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-fin-financial-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-fin-financial-bucket-bseg-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployBucketZwwCtpDeccodetCds
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-zww-ctp-deccodet-cds-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-fin-financial-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-fin-financial-bucket-zww-ctp-deccodet-cds-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployBucketCutoffDate
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-cutoff-date-bucket-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/s3/dp-fin-financial-buckets.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/s3/dp-fin-financial-bucket-cutoff-date-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+        - Name: DeployAppflowFlow
+          Actions:
+            - Name: DeployAppflowZwwCtpDeccodetCds
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-appflow-zww-ctp-deccodet-cds-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-fin-financial-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-fin-financial-zww-ctp-deccodet-cds-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployAppflowBseg
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-appflow-bseg-flow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/appflow/dp-fin-financial-appflow-flows.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/appflow/dp-fin-financial-bseg-appflow-flow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+        - Name: DeployGlue
+          Actions:
+            - Name: DeployGlueRole
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-glue-role-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/role/dp-fin-financial-glue-role.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/role/dp-fin-financial-glue-role-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 1
+
+            - Name: DeployGlueJobBsegFlow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-glue-job-bseg-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-fin-financial-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-fin-financial-bseg-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobZwwCtpDeccodetCdsFlow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-glue-job-zww-ctp-deccodet-cds-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-fin-financial-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-fin-financial-zww-ctp-deccodet-cds-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployGlueJobCutoffDateFlow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-glue-job-cutoff-date-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-fin-financial-glue-jobs.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/jobs/dp-fin-financial-cutoff-date-glue-jobs-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 2
+
+            - Name: DeployWorkflow
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn:
+                  Fn::Sub:
+                    - 'arn:aws:iam::${p}:role/svc-cloudformation-role-${Environment}'
+                    - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+                StackName: !Sub dp-fin-financial-glue-workflow-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-fin-financial-glue-workflow.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/glue/workflow/dp-fin-financial-glue-workflow-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn:
+                Fn::Sub:
+                  - 'arn:aws:iam::${p}:role/pa-pipeline-role-${Environment}'
+                  - p: !FindInMap [EnvMap, !Ref Environment, AccountNumber]
+              RunOrder: 3
+
+        - Name: DeployLambda
+          Actions:
+            - Name: DeployLambdaFunction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_AUTO_EXPAND
+                RoleArn: arn:aws:iam::590184051506:role/pa-cloudformation-role-cicd
+                StackName: !Sub dp-fin-financial-lambda-functions-${Environment}
+                TemplatePath: SourceArtifact::resource-definitions/cloudformation/lambda/dp-fin-financial-lambda-functions.yml
+                TemplateConfiguration: !Sub SourceArtifact::resource-definitions/cloudformation/lambda/dp-fin-financial-lambda-functions-conf-${Environment}.json
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts: []
+              RunOrder: 1
+        - Name: ExecuteLambda
+          Actions:
+            - Name: InvokeLambdaFunction
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Provider: Lambda
+                Version: 1
+              Configuration:
+                FunctionName: !Sub fin-financial-move-glue-scripts-to-s3-${Environment}
+              InputArtifacts: []
+              OutputArtifacts: []
+              Region: eu-west-1
+              RoleArn: arn:aws:iam::590184051506:role/svc-lambda-role-cicd
+              RunOrder: 1

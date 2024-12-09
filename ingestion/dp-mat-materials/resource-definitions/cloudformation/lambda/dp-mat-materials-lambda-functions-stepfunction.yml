@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda function for starting AppFlow.
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+
+  Domain:
+    Type: String
+
+  DataProduct:
+    Type: String
+
+  LambdaBucket:
+    Type: String
+
+  LambdaFile:
+    Type: String
+
+  LambdaName:
+    Type: String
+
+
+Resources:
+  # LambdaExecutionRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: lambda.amazonaws.com
+  #           Action: sts:AssumeRole
+  #     Policies:
+  #       - PolicyName: LambdaExecutionPolicy
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #             - Effect: Allow
+  #               Action:
+  #                 - s3:GetObject
+  #                 - logs:*
+  #               Resource: "*"
+
+  StartCheckAppFlowLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: !Sub "{$LambdaName}-{Environment}.lambda_handler"
+      Runtime: python3.9
+      Role: !Sub 'dp-${Domain}-${DataProduct}-lambda-stepfunction-role-${Environment}'
+      CodeUri:
+        Bucket: !Ref LambdaBucket
+        Key: !Ref LambdaFile

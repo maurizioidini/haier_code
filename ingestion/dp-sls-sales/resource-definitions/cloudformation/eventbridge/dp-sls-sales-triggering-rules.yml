@@ -1,0 +1,77 @@
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: ['test', 'prod']
+  EnvironmentTag:
+    Type: String
+    AllowedValues: ['tst', 'prd']
+  Domain:
+    Type: String
+  DataProduct:
+    Type: String
+
+  WorkflowName1:
+    Type: String
+  Flow1:
+    Type: String
+  DescriptiveName1:
+    Type: String
+
+
+Resources:
+
+  InitialLoadPrcdBdRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Triggering rule for batch initial load of materplant
+      EventPattern:
+        detail-type:
+          - AppFlow End Flow Run Report
+        source:
+          - aws.appflow
+        detail:
+          flow-name:
+            - !Ref Flow1
+      Name: !Sub '${Domain}-${DataProduct}-trg-glu-${DescriptiveName1}-${Environment}'
+      State: ENABLED
+      Targets:
+        - Arn: !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:workflow/${WorkflowName1}'
+          Id: !Sub '${WorkflowName1}'
+          RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/dp-${Domain}-${DataProduct}-eventbridge-role-${Environment}'
+
+  EventBridgeIAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+        Version: "2012-10-17"
+      RoleName: !Sub 'dp-${Domain}-${DataProduct}-eventbridge-role-${Environment}'
+
+  EventBridgeIAMRoleDefaultPolicy:
+      Type: AWS::IAM::Policy
+      Properties:
+        PolicyDocument:
+          Statement:
+            - Action:
+                - events:*
+                - glue:*
+                - iam:*
+              Effect: Allow
+              Resource: '*'
+            - Action:
+                - glue:*
+              Effect: Allow
+              Resource: '*'
+            - Action:
+                - glue:notifyEvent
+              Effect: Allow
+              Resource: !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:workflow/${WorkflowName1}_${Environment}'
+          Version: "2012-10-17"
+        PolicyName: !Sub 'dp-${Domain}-${DataProduct}-eventbridge-role-policy-${Environment}'
+        Roles:
+          - Ref: EventBridgeIAMRole

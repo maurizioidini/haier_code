@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+  Name:
+    Type: String
+    Description: 'The name of the data product'
+
+Mappings:
+  EnvMap:
+    test:
+      AccountNumber: '592141405271'
+    prod:
+      AccountNumber: '975942111920'
+
+Resources:
+  LambdaRolePipeline:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'dp-${Name}-lambda-role-cicd'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal: 
+              Service: 'lambda.amazonaws.com'
+              AWS: 'arn:aws:iam::590184051506:role/svc-lambda-role-cicd'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: !Sub 'dp-${Name}-lambda-policy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - "codepipeline:PutJobSuccessResult"
+                  - "codepipeline:PutJobFailureResult"
+                  - 'sts:AssumeRole'
+                  - 'logs:*'
+                Resource: '*'
+                Effect: 'Allow'

@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview t052u",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-paymenttermsconditionstext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-i-paymenttermsconditionstext-t052u",
+        "Object": "/sap/opu/odata/sap/ZAWS_ACCOUNTING_SRV/I_PaymentTermsConditionsText",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "fin",
+        "SourceDest": "sap",
+        "Environment": "prd",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "zww-ctp-deccodet-cds",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "Parameters": {
+    "Domain": "mat",
+    "DataProduct": "materials",
+    "Environment": "test"
+  }
+}

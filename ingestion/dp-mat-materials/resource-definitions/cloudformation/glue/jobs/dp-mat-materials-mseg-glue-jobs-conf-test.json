@@ -1,0 +1,34 @@
+{
+    "Parameters": {
+        "Domain": "mat",
+        "SourceSystem": "sap",
+        "SourceBucketName": "zww-ptp-nsdm-e-mseg",
+        "SourceLayer": "ing",
+        "DataProduct" : "mat-materials",
+        "DataTypeSource": "raw",
+        "DataTypeTarget": "rel",
+        "TargetSchemaName": "dwa",
+        "TargetTableName": "sap_mat_ft_zww_ptp_nsdm_e_mseg_mseg",
+        "Mode": "Full",
+        "Pkey": "MBLNR,MJAHR,ZEILE",
+        "Description": "",
+        "NumberOfWorkers": "2",
+        "WorkerType": "G.1X",
+        "ExecutionClass": "STANDARD",
+        "ClusterIdentifier": "haier-dwh-test-redshift-1",
+        "RedshiftConnection": "mat-redshift-connection-test",
+        "DbUser": "dwh_user",
+        "DbName": "dwhtest",
+        "RedshiftTmpDir": "s3://aws-glue-assets-592141405271-eu-west-1/temporary/",
+        "DriverJdbc": "jdbc:redshift",
+        "Host": "haier-dwh-test-redshift-1.csbqoeassujt.eu-west-1.redshift.amazonaws.com",
+        "Port": "5439",
+        "Region": "eu-west-1",
+        "SupplierTag": "spx",
+        "JobRole": "arn:aws:iam::592141405271:role/dp-mat-materials-glue-role-test",
+        "ScriptLocation": "s3://glue-code-dependencies-test/glue-scripts/dp-mat-materials/dp-mat-materials-glue-job.py",
+        "EnvironmentTag": "tst",
+        "IncrementalField": "<EMPTY>"
+    }
+}
+

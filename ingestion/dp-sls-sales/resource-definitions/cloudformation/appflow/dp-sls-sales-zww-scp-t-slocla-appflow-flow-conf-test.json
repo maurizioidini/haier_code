@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview zww-scp-t-slocla",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-scp-t-slocla-cds",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-zww-scp-t-slocla-cds",
+        "Object": "/sap/opu/odata/sap/ZAWS_INVENTORY_SRV/ZWW_SCP_T_SLOCLA_CDS",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}

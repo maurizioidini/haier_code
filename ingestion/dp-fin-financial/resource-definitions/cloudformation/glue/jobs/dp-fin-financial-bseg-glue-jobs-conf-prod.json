@@ -1,0 +1,31 @@
+{
+    "Parameters": {
+        "Domain": "fin",
+        "SourceSystem": "sap",
+        "SourceBucketName": "fin-sap-prd-ing-raw-zww-ftm-bseg",
+        "DataTypeSource": "raw",
+        "DataTypeTarget": "rel",
+        "TargetSchemaName": "dwa",
+        "TargetTableName": "sap_fin_ft_zww_ftm_bseg",
+        "Description": "",
+        "NumberOfWorkers": "4",
+        "WorkerType": "G.4X",
+        "ExecutionClass": "STANDARD",
+        "ClusterIdentifier": "haier-dwh-prod-redshift-1",
+        "RedshiftConnection": "fin-redshift-connection-prod",
+        "DbUser": "dwh_user",
+        "DbName": "dwhprod",
+        "RedshiftTmpDir": "s3://aws-glue-assets-975942111920-eu-west-1/temporary/",
+        "DriverJdbc": "jdbc:redshift",
+        "Host": "haier-dwh-prod-redshift-1.cs87oo23jhau.eu-west-1.redshift.amazonaws.com",
+        "Port": "5439",
+        "Region": "eu-west-1",
+        "Mode": "Full",
+        "Pkey": "BUKRS,BELNR,GJAHR,BUZEI",
+        "SupplierTag": "spx",
+        "JobRole": "arn:aws:iam::975942111920:role/dp-fin-financial-glue-role-prod",
+        "ScriptLocation": "s3://glue-code-dependencies-prod/glue-scripts/dp-fin-financial/dp-fin-financial-glue-job.py",
+        "EnvironmentTag": "prd",
+        "IncrementalField": "<EMPTY>"
+    }
+}

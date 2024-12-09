@@ -1,0 +1,18 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tvbur",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-i-salesoffice-tvbur",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "sls-sales",
+        "BucketName": "data",
+        "Environment": "tst",
+        "Object": " /sap/opu/odata/sap/ZAWS_GENERAL_SRV/ZWW_OTC_I_SalesOffice",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}

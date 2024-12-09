@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tvv5t",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-additionalcustomergroup5text",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-i-additionalcustomergroup5text-tvv5t",
+        "Object": "/sap/opu/odata/sap/ZAWS_CUSTOMER_SRV/I_AdditionalCustomerGroup5Text",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}

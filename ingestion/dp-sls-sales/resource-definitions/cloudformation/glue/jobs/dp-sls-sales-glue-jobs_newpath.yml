@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  # name
+  Domain:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, fin, hre, iot, mat, pla, pro, pur, sls]
+  SourceSystem:
+    Type: String
+    AllowedValues: [ago, cpm, hqd, hon, scp, qlk, slf, sap, tms, sno, sie]
+  SourceBucketName:
+    Type: String
+  DataTypeSource:
+    Type: String
+    Description: Specify the category for the input data of the flow
+    AllowedValues: [odm, raw, rel]
+  DataTypeTarget:
+    Type: String
+    Description: Specify the category for the output data of the flow
+    AllowedValues: [odm, raw, rel]
+  TargetSchemaName:
+    Type: String
+  TargetTableName:
+    Type: String
+  Description:
+    Type: String
+  JobRole:
+    Type: String
+  JobType:
+    Type: String
+    Default: pythonshell
+  ScriptLocation:
+    Type: String
+    Description: S3 location of the script of the job
+  NumberOfWorkers:
+    Type: Number
+    Description: Specify the number of workers (0 means not set)
+    Default: 0
+  WorkerType: # not supported for pythonshell
+    Type: String
+  ExecutionClass:
+    Type: String
+    AllowedValues: [STANDARD, FLEX]
+    Default: STANDARD
+  ClusterIdentifier:
+    Type: String
+  DbUser:
+    Type: String
+  DbName:
+    Type: String
+  RedshiftTmpDir:
+    Type: String
+  DriverJdbc:
+    Type: String
+  Host:
+    Type: String
+  Port:
+    Type: String
+  Region:
+    Type: String
+  Mode:
+    Type: String
+    AllowedValues: [Full, Delta]
+  Pkey:
+    Type: String
+  RedshiftConnection:
+    Type: String
+  IncrementalField:
+    Type: String
+  DataProduct:
+    Type: String
+  SourceLayer:
+    Type: String
+
+  # tags
+  EnvironmentTag:
+    Type: String
+    Description: EnvironmentTag
+    Default: dev
+    AllowedValues: [prd, dev, tst]
+  SupplierTag:
+    Type: String
+    Description: SupplierTag
+
+Resources:
+  Job:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: !Sub '${Domain}_${SourceSystem}_from_${SourceBucketName}_${DataTypeSource}_to_${DataTypeTarget}_${TargetTableName}'
+      Description: !Ref Description
+      Role: !Ref JobRole
+      Command:
+        Name: glueetl
+        PythonVersion: 3
+        ScriptLocation: !Ref ScriptLocation
+      DefaultArguments:
+        --enable-auto-scaling: true
+        --SourceBucketName: !Sub '${Domain}-data-${EnvironmentTag}/${DataProduct}/${SourceLayer}/${SourceBucketName}/'
+        --TargetSchemaName: !Ref TargetSchemaName
+        --TargetTableName: !Ref TargetTableName
+        --ClusterIdentifier: !Ref ClusterIdentifier
+        --DbUser: !Ref DbUser
+        --DbName: !Ref DbName
+        --RedshiftTmpDir: !Ref RedshiftTmpDir
+        --DriverJdbc: !Ref DriverJdbc
+        --Host: !Ref Host
+        --Port: !Ref Port
+        --Region: !Ref Region
+        --Mode: !Ref Mode
+        --Pkey: !Ref Pkey
+        --IncrementalField: !Ref IncrementalField
+        --JobRole: !Ref JobRole
+      GlueVersion: "4.0"
+      NumberOfWorkers: !Ref NumberOfWorkers
+      WorkerType: !Ref WorkerType
+      ExecutionClass: !Ref ExecutionClass
+      Connections:
+        Connections:
+          - !Ref RedshiftConnection
+      NotificationProperty:
+        NotifyDelayAfter: 180
+      Timeout: 3600
+      MaxRetries: 1
+      Tags:
+        Domain: !Ref Domain
+        Environment: !Ref EnvironmentTag
+        Supplier: !Ref SupplierTag

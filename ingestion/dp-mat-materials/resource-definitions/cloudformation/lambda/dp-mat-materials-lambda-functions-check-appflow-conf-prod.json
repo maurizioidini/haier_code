@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+        "Environment": "prod",
+        "LambdaName":"dp-mat-materials-check-appflow-lambda",
+        "LambdaFile":"dp-mat-materials-check-appflow-lambda-job.py",
+        "LambdaBucket":"s3://glue-code-dependencies-prod/glue-scripts/dp-mat-materials/lambda/",
+        "Domain": "mat",
+        "DataProduct": "materials"
+    }
+}

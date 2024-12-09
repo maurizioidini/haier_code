@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview mkol",
+        "DomainName": "mat",
+        "SourceName": "sap",
+        "SourceObject": "zww-ptp-nsdm-e-mkol",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "mat-sap-prd-ing-raw-zww-ptp-nsdm-e-mkol",
+        "Object": "/sap/opu/odata/sap/ZAWS_INVENTORY_SRV/ZWW_PTP_nsdm_e_mkol",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

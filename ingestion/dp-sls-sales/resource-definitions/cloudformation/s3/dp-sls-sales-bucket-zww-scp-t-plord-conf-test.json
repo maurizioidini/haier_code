@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "sls",
+        "SourceDest": "sap",
+        "Environment": "tst",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "zww-scp-t-plord-cds",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "Parameters": {
+      "Environment": "prod",
+      "LambdaCheckName": "dp-mat-materials-check-appflow-lambda-prod",
+      "LambdaStartName": "dp-mat-materials-start-appflow-lambda-prod",
+      "WorkflowName": "dp-mat-materials-glue-workflow-prod",
+      "AppFlow1":"mat-from-sap-i-producthierarchytext-to-s3-ing-mat-sap-prd-ing-raw-i-producthierarchytext-t179t",
+      "AppFlow2":"mat-from-sap-zww-ptp-ausp-ausp-to-s3-ing-data"
+
+  }
+}

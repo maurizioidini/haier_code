@@ -1,0 +1,6 @@
+{
+    "Parameters": {
+        "Name": "del-delivery",
+        "Environment": "test"
+    }
+}

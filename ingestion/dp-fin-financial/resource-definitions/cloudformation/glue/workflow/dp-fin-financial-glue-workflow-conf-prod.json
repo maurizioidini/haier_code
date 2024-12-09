@@ -1,0 +1,11 @@
+{
+  "Parameters": {
+      "Domain": "fin",
+      "DataProduct": "financial",
+      "Environment": "prod",
+      "ScheduleCron": "cron(30 4 ? * * *)",
+      "Job1" : "fin_sap_from_fin-sap-prd-ing-raw-zww-ftm-bseg_raw_to_rel_sap_fin_ft_zww_ftm_bseg",
+      "Job2" : "fin_sap_from_fin-sap-prd-ing-raw-zww-ctp-deccodet-cds_raw_to_rel_sap_fin_ft_zww_ctp_deccodet_cds",
+      "Job3" : "fin_sap_from_fin-sap-prd-ing-raw-cutoff-date_raw_to_rel_qlk_fin_cutoff_date"
+  }
+}

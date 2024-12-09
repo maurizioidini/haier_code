@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vbap",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-salesdocumentitem",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-i-salesdocumentitem-vbap",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/ZWW_OTC_I_SalesDocumentItem",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "IncrementalField": "LastChangeDate",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

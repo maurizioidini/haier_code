@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tinct",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-incotermsclassificationtext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-i-incotermsclassificationtext-tinct",
+        "Object": "/sap/opu/odata/sap/ZAWS_CUSTOMER_SRV/I_IncotermsClassificationText",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

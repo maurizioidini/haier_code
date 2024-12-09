@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview t179t",
+        "DomainName": "mat",
+        "SourceName": "sap",
+        "SourceObject": "i-producthierarchytext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "mat-sap-tst-ing-raw-i-producthierarchytext-t179t",
+        "Object": "/sap/opu/odata/sap/ZAWS_MATERIAL_SRV/I_ProductHierarchyText",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

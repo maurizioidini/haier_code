@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ""
+
+Parameters:
+  DataProductName:
+    Type: String
+  Environment:
+    Type: String
+    AllowedValues: [test, prod]
+
+Resources:
+  PipelineTriggeringRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "dp-${DataProductName}-pipeline-${Environment}-triggering-rule"
+      EventPattern:
+        source:
+          - aws.codecommit
+        detail-type:
+          - 'CodeCommit Repository State Change'
+        resources:
+          - !Join [ '', [ 'arn:aws:codecommit:', !Ref 'AWS::Region', ':', !Ref 'AWS::AccountId', ':dp-', !Ref DataProductName ] ]
+        detail:
+          event:
+            - referenceCreated
+            - referenceUpdated
+          referenceType:
+            - branch
+          referenceName:
+            - !Ref Environment
+      Targets:
+        -
+          Arn:
+            !Join [ '', [ 'arn:aws:codepipeline:', !Ref 'AWS::Region', ':', !Ref 'AWS::AccountId', ':dp-', !Ref DataProductName, '-pipeline-', !Ref Environment ] ]
+          RoleArn: arn:aws:iam::590184051506:role/svc-pipeline-triggering-role
+          Id: !Sub "dp-${DataProductName}-pipeline-${Environment}"

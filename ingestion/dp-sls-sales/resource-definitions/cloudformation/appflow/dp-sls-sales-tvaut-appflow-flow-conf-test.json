@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tvaut",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-sddocumentreasontext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-i-sddocumentreasontext-tvaut",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/I_SDDocumentReasonText",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

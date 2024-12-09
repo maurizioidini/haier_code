@@ -1,0 +1,150 @@
+{
+    "Name": "mtd.sap_dm_i_companycode_t001",
+    "Description": "COMPANYCODE",
+    "PrimaryKey": [
+        "companycode"
+    ],
+    "SortKey": [
+        "companycode"
+    ],
+    "Column": [
+        {
+            "Name": "companycode",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "companycodename",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "cityname",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "country",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "currency",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "language",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "chartofaccounts",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "fiscalyearvariant",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "company",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "creditcontrolarea",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "creditcontrolarea_text",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "countrychartofaccounts",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "financialmanagementarea",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "addressid",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "taxableentity",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "vatregistration",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "extendedwhldgtaxisactive",
+            "Type": "BOOL",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "controllingarea",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "controllingarea_text",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "fieldstatusvariant",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "nontaxabletransactiontaxcode",
+            "Type": "VARCHAR(65535)",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "docdateisusedfortaxdetn",
+            "Type": "BOOL",
+            "Comment": "",
+            "Encode": "lzo"
+        },
+        {
+            "Name": "taxrptgdateisactive",
+            "Type": "BOOL",
+            "Comment": "",
+            "Encode": "lzo"
+        }
+    ]
+}

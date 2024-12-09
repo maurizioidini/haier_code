@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Domain:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, fin, hre, iot, mat, pla, pro, pur, sls]
+  DataProduct:
+    Type: String
+  TargetTableName:
+    Type: String
+  EnvironmentTag:
+    Type: String
+    Description: EnvironmentTag
+    Default: dev
+    AllowedValues: [prd, dev, tst]
+  JobRole:
+    Type: String
+  SourceSystem:
+    Type: String
+    AllowedValues: [ago, cpm, hqd, hon, scp, qlk, slf, sap, tms, sno, sie]
+  ScriptLocation:
+    Type: String
+    Description: S3 location of the script of the job
+  NumberOfWorkers:
+    Type: Number
+    Description: Specify the number of workers (0 means not set)
+    Default: 0
+  WorkerType: # not supported for pythonshell
+    Type: String
+  ExecutionClass:
+    Type: String
+    AllowedValues: [STANDARD, FLEX]
+    Default: STANDARD
+  SupplierTag:
+    Type: String
+    Description: SupplierTag
+  JobType:
+    Type: String
+  FilterField:
+    Type: String
+  IntervalStartDate:
+    Type: String
+  IntervalEndDate:
+    Type: String
+  Granularity:
+    Type: String
+  DeltaGranularity:
+    Type: String
+
+Conditions:
+  IsPythonShell: !Equals [!Ref JobType, pythonshell]
+  IsPythonShellOrNoWorkers: !Or
+    - !Condition IsPythonShell
+    - !Equals [!Ref NumberOfWorkers, 0]
+
+
+
+
+Resources:
+  PrcdBdInitialLoadBatch:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: !Sub '${Domain}_${DataProduct}_${TargetTableName}'
+      Description: !Sub 'Glue job to automatically start ${Domain}-from-${SourceSystem}-${TargetTableName}-initial-load-to-s3-ing-${Domain}-data-${EnvironmentTag} in batches for initial load'
+      Role: !Ref JobRole
+      Command:
+        Name: pythonshell
+        PythonVersion: 3.9
+        ScriptLocation: !Ref ScriptLocation
+      ExecutionProperty:
+        MaxConcurrentRuns: 2
+      DefaultArguments:
+        --enable-auto-scaling: true
+        --flow_name: !Sub '${Domain}-from-${SourceSystem}-${TargetTableName}-to-s3-ing-data'
+        --end_date: !Sub '${IntervalEndDate}'
+        --granularity: !Sub '${Granularity}'
+        --delta_granularity: !Sub '${DeltaGranularity}'
+        --field_to_filter: !Ref FilterField
+        --additional-python-modules: 'boto3==1.35.8'
+      GlueVersion: 3.0 # 4.0 is only supported for Glue ETL, Ray and Streaming jobs.
+      NumberOfWorkers: !If [IsPythonShellOrNoWorkers, !Ref AWS::NoValue, !Ref NumberOfWorkers]
+      WorkerType: !If [IsPythonShell, !Ref AWS::NoValue, !Ref WorkerType]
+      ExecutionClass: !Ref ExecutionClass
+      NotificationProperty:
+        NotifyDelayAfter: 60
+      MaxCapacity: 0.0625
+      Timeout: 180
+      MaxRetries: 0
+      Tags:
+        Domain: !Ref Domain
+        Environment: !Ref EnvironmentTag
+        Supplier: !Ref SupplierTag
+
+  PrcdBdInitialLoadBatchParams:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '/initial-load/${Domain}-from-${SourceSystem}-${TargetTableName}-to-s3-ing-data'
+      Type: String
+      Value: !Sub '{
+          "interval_start_date": "${IntervalStartDate}",
+          "interval_end_date": "${IntervalEndDate}"
+        }'
+      Description: 'Glue Job specification'
+      Tags:
+        Domain: !Ref Domain
+        Environment: !Ref EnvironmentTag
+        Supplier: !Ref SupplierTag

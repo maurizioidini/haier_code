@@ -1,0 +1,18 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview t001l",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-storagelocation",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "sls-sales",
+        "BucketName": "data",
+        "Environment": "tst",
+        "Object": "/sap/opu/odata/sap/ZAWS_MATERIAL_SRV/I_StorageLocation",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}

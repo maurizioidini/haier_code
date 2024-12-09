@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tvak",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-salesdocumenttype",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-i-salesdocumenttype-tvak",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/I_SalesDocumentType",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

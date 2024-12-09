@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "mat",
+        "SourceDest": "sie",
+        "Environment": "tst",
+        "Layer": "pro",
+        "DataType": "rel",
+        "Name": "material-data",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

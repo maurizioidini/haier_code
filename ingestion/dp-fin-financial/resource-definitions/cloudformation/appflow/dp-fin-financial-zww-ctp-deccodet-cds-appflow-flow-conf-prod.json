@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview zww-ctp-deccodet",
+        "DomainName": "fin",
+        "SourceName": "sap",
+        "SourceObject": "zww-ctp-deccodet-cds",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "fin-sap-prd-ing-raw-zww-ctp-deccodet-cds",
+        "Object": "/sap/opu/odata/sap/ZAWS_PRODUCT_SRV/ZWW_CTP_DECCODET_CDS",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

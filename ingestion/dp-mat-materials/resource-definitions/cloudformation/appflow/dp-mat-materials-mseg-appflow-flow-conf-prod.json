@@ -1,0 +1,19 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview ausp",
+        "DomainName": "mat",
+        "SourceName": "sap",
+        "SourceObject": "zww-ptp-nsdm-e-mseg",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "mat-materials",
+        "Environment": "prd",
+        "BucketName": "data",
+        "Object": "/sap/opu/odata/sap/ZAWS_MATERIAL_SRV/ZWW_PTP_nsdm_e_mseg",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}
+

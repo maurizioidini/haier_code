@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Domain:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, eco, fin, hre, iot, mat, pla, pro, pur, sls]
+  DataProduct:
+    Type: String
+  Environment:
+    Type: String
+    Description: Specifies the environment of the trigger
+    AllowedValues: [test, prod]
+  # Job Glue
+  Job1:
+    Type: String
+  Job2:
+    Type: String
+  Job3:
+    Type: String
+
+  ScheduleCron:
+    Type: String
+    Default: ''
+    Description: Cron schedule
+
+Conditions:
+  IsScheduled: !Not [ !Equals [ !Ref ScheduleCron, '' ] ]
+
+
+Resources:
+  FinFinancialWorkflow:
+    Type: AWS::Glue::Workflow
+    Properties:
+      Description: !Sub "dp-${Domain}-${DataProduct} ${Environment} workflow"
+      MaxConcurrentRuns: 1
+      Name: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+
+  StartTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type:
+        !If
+          - IsScheduled
+          - SCHEDULED
+          - ON_DEMAND
+      Schedule:
+        !If
+          - IsScheduled
+          - !Ref ScheduleCron
+          - !Ref 'AWS::NoValue'
+      StartOnCreation: true
+      Description: "fin-financial Start Trigger"
+      Actions:
+        - JobName: !Ref Job1
+        - JobName: !Ref Job2
+        - JobName: !Ref Job3
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_start_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"

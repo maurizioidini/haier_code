@@ -1,0 +1,18 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview mara",
+        "DomainName": "mat",
+        "SourceName": "sap",
+        "SourceObject": "i-product",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "mat-materials",
+        "Environment": "tst",
+        "BucketName": "data",
+        "Object": "/sap/opu/odata/sap/ZAWS_PRODUCT_SRV/I_Product",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

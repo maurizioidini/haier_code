@@ -1,0 +1,31 @@
+{
+    "Parameters": {
+        "Domain": "fin",
+        "SourceSystem": "sap",
+        "SourceBucketName": "fin-sap-tst-ing-raw-cutoff-date",
+        "DataTypeSource": "raw",
+        "DataTypeTarget": "rel",
+        "TargetSchemaName": "man",
+        "TargetTableName": "qlk_fin_cutoff_date",
+        "Description": "",
+        "NumberOfWorkers": "2",
+        "WorkerType": "G.1X",
+        "ExecutionClass": "STANDARD",
+        "ClusterIdentifier": "haier-dwh-test-redshift-1",
+        "RedshiftConnection": "redshift-connection-test",
+        "DbUser": "dwh_user",
+        "DbName": "dwhtest",
+        "RedshiftTmpDir": "s3://aws-glue-assets-592141405271-eu-west-1/temporary/",
+        "DriverJdbc": "jdbc:redshift",
+        "Host": "haier-dwh-test-redshift-1.csbqoeassujt.eu-west-1.redshift.amazonaws.com",
+        "Port": "5439",
+        "Region": "eu-west-1",
+        "Mode": "Full",
+        "Pkey": "month",
+        "SupplierTag": "spx",
+        "JobRole": "arn:aws:iam::592141405271:role/dp-fin-financial-glue-role-test",
+        "ScriptLocation": "s3://glue-code-dependencies-test/glue-scripts/dp-fin-financial/dp-fin-financial-glue-job.py",
+        "EnvironmentTag": "tst",
+        "IncrementalField": "<EMPTY>"
+    }
+}

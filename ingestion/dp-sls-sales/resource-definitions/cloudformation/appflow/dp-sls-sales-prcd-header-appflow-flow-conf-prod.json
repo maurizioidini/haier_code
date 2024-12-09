@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for prcd header",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-v-konv-cust-so-header-prcd-elements",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-zww-otc-v-konv-cust-so-header-prcd-elements",
+        "Object": "/sap/opu/odata/sap/ZAWS_PRICINGELEMENT_SRV/ZWW_OTC_V_KONV_CUST_SO_HEADER",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "IncrementalField": "DeltaDate",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

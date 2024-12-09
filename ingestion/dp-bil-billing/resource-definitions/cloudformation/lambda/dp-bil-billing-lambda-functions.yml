@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+
+Transform: AWS::Serverless-2016-10-31
+Description: ''
+Resources:
+  DpBilBillingCdsViewMoveGlueScriptsToS3:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub bil-billing-move-glue-scripts-to-s3-${Environment}
+      CodeUri:
+        Bucket: ip-lambda-dependencies
+        Key: !Sub scripts/move-glue-scripts-to-s3.zip
+      Environment:
+        Variables:
+          environment: !Ref Environment
+          dataProductName: bil-billing
+          branchName: !Ref Environment
+      Description: ''
+      Role: arn:aws:iam::590184051506:role/svc-lambda-role-cicd
+      MemorySize: 128
+      Timeout: 600
+      Handler: move-glue-scripts-to-s3.lambda_function.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      PackageType: Zip
+      SnapStart:
+        ApplyOn: None
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto

@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vbrk",
+        "DomainName": "bil",
+        "SourceName": "sap",
+        "SourceObject": "i-billingdocument",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "bil-sap-prd-ing-raw-i-billingdocument-vbrk",
+        "Object": "/sap/opu/odata/sap/ZAWS_BILLINGDOCUMENT_SRV/ZWW_OTC_I_BillingDoc",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)",
+        "IncrementalField": "LastChangeDate"
+    }
+}

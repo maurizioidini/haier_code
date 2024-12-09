@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vttk",
+        "DomainName": "del",
+        "SourceName": "sap",
+        "SourceObject": "zww-dts-aws-shipment",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "del-sap-prd-ing-raw-zww-dts-aws-shipment-vttk",
+        "Object": "/sap/opu/odata/sap/ZAWS_SHIPMENT_SRV/ZWW_DTS_AWS_SHIPMENT",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

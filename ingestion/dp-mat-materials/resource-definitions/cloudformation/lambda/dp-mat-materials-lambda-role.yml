@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ''
+
+Parameters:
+  Environment:
+    Type: String
+    Description: 'The name of the environment (e.g., test, prod).'
+    AllowedValues: ['test', 'prod']
+  Domain:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, eco, fin, hre, iot, mat, pla, pro, pur, sls]
+    Description: 'The domain of interest'
+  DataProduct:
+    Type: String
+    Description: 'The name of the data product'
+
+Mappings:
+  EnvMap:
+    test:
+      AccountNumber: '592141405271'
+    prod:
+      AccountNumber: '975942111920'
+
+Resources:
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'dp-${Domain}-${DataProduct}-lambda-stepfunction-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+              AWS: !Sub 'arn:aws:iam::590184051506:role/dp-${Domain}-${DataProduct}-lambda-role-cicd'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: !Sub 'dp-${Domain}-${DataProduct}-lambda-stepfunction-policy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - 'redshift:*'
+                  - 'redshift-data:*'
+                  - 'sts:AssumeRole'
+                  - 'logs:*'
+                  - 'ssm:GetParameter'
+                  - 'ssm:GetParameters'
+                  - 'ssm:GetParameterHistory'
+                  - 'ssm:GetParametersByPath'
+                Resource: '*'
+                Effect: 'Allow'

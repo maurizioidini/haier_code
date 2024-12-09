@@ -1,0 +1,31 @@
+{
+    "Parameters": {
+        "Domain": "del",
+        "SourceSystem": "sap",
+        "SourceBucketName": "del-sap-tst-ing-raw-i-routetext-tvrot",
+        "DataTypeSource": "raw",
+        "DataTypeTarget": "rel",
+        "TargetSchemaName": "mtd",
+        "TargetTableName": "sap_dm_i_routetext_tvrot",
+        "Description": "",
+        "NumberOfWorkers": "2",
+        "WorkerType": "G.1X",
+        "ExecutionClass": "STANDARD",
+        "ClusterIdentifier": "haier-dwh-test-redshift-1",
+        "RedshiftConnection": "redshift-connection-test",
+        "DbUser": "dwh_user",
+        "DbName": "dwhtest",
+        "RedshiftTmpDir": "s3://aws-glue-assets-592141405271-eu-west-1/temporary/",
+        "DriverJdbc": "jdbc:redshift",
+        "Host": "haier-dwh-test-redshift-1.csbqoeassujt.eu-west-1.redshift.amazonaws.com",
+        "Port": "5439",
+        "Region": "eu-west-1",
+        "Mode": "Full",
+        "Pkey": "Route,Language",
+        "SupplierTag": "spx",
+        "JobRole": "arn:aws:iam::592141405271:role/dp-del-delivery-glue-role-test",
+        "ScriptLocation": "s3://glue-code-dependencies-test/glue-scripts/dp-del-delivery/dp-del-delivery-glue-job.py",
+        "EnvironmentTag": "tst",
+        "IncrementalField": "<EMPTY>"
+    }
+}

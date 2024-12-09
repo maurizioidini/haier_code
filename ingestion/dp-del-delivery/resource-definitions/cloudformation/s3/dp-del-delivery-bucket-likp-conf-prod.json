@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "del",
+        "SourceDest": "sap",
+        "Environment": "prd",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "zww-otc-aws-i-deliverydoc-cust-likp",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

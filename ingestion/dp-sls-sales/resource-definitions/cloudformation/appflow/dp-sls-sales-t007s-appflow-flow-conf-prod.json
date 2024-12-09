@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview t007s",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-taxcodetext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-i-taxcodetext-t007s",
+        "Object": "/sap/opu/odata/sap/ZAWS_ACCOUNTING_SRV/I_TaxCodeText",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

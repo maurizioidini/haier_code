@@ -1,0 +1,18 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview cabn",
+        "DomainName": "mat",
+        "SourceName": "sap",
+        "SourceObject": "zww-ptp-cabn-cabn",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "mat-materials",
+        "Environment": "tst",
+        "BucketName": "data",
+        "Object": "/sap/opu/odata/sap/ZAWS_MATERIAL_SRV/ZWW_PTP_CABN",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

@@ -1,0 +1,138 @@
+{
+    "Name": "dwa.sap_dto_ft_zww_cat_aws_i_chdocitem_cust_cdpos",
+    "Description": "Change document items (CDPOS)",
+    "PrimaryKey": [
+        "changedocobject",
+        "changedocument",
+        "changedocdatabasetablefield",
+        "changedocobjectclass",
+        "databasetable",
+        "changedoctablekey",
+        "changedocitemchangetype"
+    ],
+    "SortKey": [
+        "changedocobject",
+        "changedocument",
+        "changedocdatabasetablefield",
+        "changedocobjectclass",
+        "databasetable",
+        "changedoctablekey",
+        "changedocitemchangetype"
+    ],
+    "Column": [
+        {
+            "Name": "creationdate",
+            "Type": "TIMESTAMP",
+            "Comment": "",
+            "Encode": "AZ64"
+        },
+        {
+            "Name": "changedocobject",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocobjectclass",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocument",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "databasetable",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedoctablekey",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocdatabasetablefield",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocitemchangetype",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "databasetabletext",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "abapdataelementdescription",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocitemchangetypetext",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocpreviousunit",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocnewunit",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocpreviouscurrency",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocnewcurrency",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocnewfieldvalue",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocpreviousfieldvalue",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "ingestion_date",
+            "Type": "datetime",
+            "Comment": "",
+            "Encode": "AZ64"
+        },
+        {
+            "Name": "end_validity_date",
+            "Type": "datetime",
+            "Comment": "",
+            "Encode": "AZ64"
+        }
+    ]
+}

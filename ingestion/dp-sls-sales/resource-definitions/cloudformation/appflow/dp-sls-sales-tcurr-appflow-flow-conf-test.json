@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tcurr",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-exchangeraterawdata",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-i-exchangeraterawdata-tcurr",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/ZWW_OTC_I_ExchangeRateRawData",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

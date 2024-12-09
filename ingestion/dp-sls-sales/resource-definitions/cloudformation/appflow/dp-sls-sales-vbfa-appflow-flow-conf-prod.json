@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vbfa",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-i-sddocmultlvlprocflow",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-prd-ing-raw-zww-otc-i-sddocmultlvlprocflow-vbfa",
+        "Object": "/sap/opu/odata/sap/ZAWS_SALESORDERS_SRV/ZWW_OTC_I_SDDocMultLvlProcFlow",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "IncrementalField": "LastChangeDate",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

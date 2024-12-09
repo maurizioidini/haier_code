@@ -1,0 +1,23 @@
+{
+  "Parameters": {
+      "Domain": "qlik",
+      "DataProduct": "reporting",
+      "Environment": "prod",
+      "ScheduleCron": "cron(30 5 ? * * *)",
+      "JobPbcs": "dto_sie_from_cst-pbcs-prd-ing-raw-cost-data_raw_to_rel_pbcs",
+      "JobModel": "dto_sie_from_mat-data-prd_raw_to_rel_model",
+      "JobScp" : "dto_sie_from_pla-data-prd_raw_to_rel_scp",
+      "JobBronze" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_raw_to_rel_bronze",
+      "JobMapping" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_mapping",
+      "JobSapOrdGs" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_ord-gs",
+      "JobSapInvGs" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_inv-gs",
+      "JobSapDelGs" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_del-gs",
+      "JobCasGs": "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_cas-gs",
+      "JobSalesAnalysisHetlAnagrafiche" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_salesanalysis-hetlanagrafiche",
+      "JobSalesAnalysisHetl2Gs" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_salesanalysis-hetl2-gs",
+      "JobSalesAnalysisHetl3Gs" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_salesanalysis-hetl3-gs",
+      "JobPortfolioDetailGs" : "dto_sap_from_dto-qlk-prd-pro-rel-reporting_rel_to_rel_portfolio-detail-gs"
+
+  }
+}
+

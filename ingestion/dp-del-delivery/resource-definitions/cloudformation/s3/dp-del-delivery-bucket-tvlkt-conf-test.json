@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "del",
+        "SourceDest": "sap",
+        "Environment": "tst",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "i-deliverydocumenttypetext-tvlkt",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

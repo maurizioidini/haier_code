@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview kna1",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "i-customer",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "sls-sap-tst-ing-raw-i-customer-kna1",
+        "Object": "/sap/opu/odata/sap/ZAWS_CUSTOMER_SRV/I_Customer",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(30 1 ? * * *)"
+    }
+}

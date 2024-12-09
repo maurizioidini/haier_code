@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview vttp",
+        "DomainName": "del",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-aws-shipment-item",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "del-sap-prd-ing-raw-zww-otc-aws-shipment-item-vttp",
+        "Object": "/sap/opu/odata/sap/ZAWS_SHIPMENT_SRV/ZWW_OTC_AWS_SHIPMENT_ITEM",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

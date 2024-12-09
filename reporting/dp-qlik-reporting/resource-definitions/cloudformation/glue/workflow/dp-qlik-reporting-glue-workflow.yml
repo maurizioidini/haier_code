@@ -1,0 +1,217 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Domain:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, eco, fin, hre, iot, mat, pla, pro, pur, sls, qlik]
+  DataProduct:
+    Type: String
+  Environment:
+    Type: String
+    Description: Specifies the environment of the trigger
+    AllowedValues: [test, prod]
+  # Job Glue
+  JobPbcs:
+    Type: String
+  JobModel:
+    Type: String
+  JobScp:
+    Type: String
+  JobBronze:
+    Type: String
+  JobMapping:
+    Type: String
+  JobSapOrdGs:
+    Type: String
+  JobSapInvGs:
+    Type: String
+  JobSapDelGs:
+    Type: String
+  JobCasGs:
+    Type: String
+  JobSalesAnalysisHetlAnagrafiche:
+    Type: String
+  JobSalesAnalysisHetl2Gs:
+    Type: String
+  JobSalesAnalysisHetl3Gs:
+    Type: String
+  JobPortfolioDetailGs:
+    Type: String
+
+
+  ScheduleCron:
+    Type: String
+    Default: ''
+    Description: Cron schedule
+
+Conditions:
+  IsScheduled: !Not [ !Equals [ !Ref ScheduleCron, '' ] ]
+
+
+Resources:
+  QlikReportingWorkflow:
+    Type: AWS::Glue::Workflow
+    Properties:
+      Description: !Sub "dp-${Domain}-${DataProduct} ${Environment} workflow"
+      MaxConcurrentRuns: 1
+      Name: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  StartTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type:
+        !If
+          - IsScheduled
+          - SCHEDULED
+          - ON_DEMAND
+      Schedule:
+        !If
+          - IsScheduled
+          - !Ref ScheduleCron
+          - !Ref 'AWS::NoValue'
+      StartOnCreation: true
+      Description: "qlik reporting Start Trigger"
+      Actions:
+        - JobName: !Ref JobPbcs
+        - JobName: !Ref JobModel
+        - JobName: !Ref JobScp
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_start_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  BronzeTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref JobPbcs
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobModel
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobScp
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow mapping Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref JobBronze
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_bronze_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  MappingAnagraficheTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref JobBronze
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow mapping Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref JobMapping
+        - JobName: !Ref JobSalesAnalysisHetlAnagrafiche
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_mapping_anagrafiche_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  OrdInvDelTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref JobMapping
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobSalesAnalysisHetlAnagrafiche
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow ord inv del Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref JobSapOrdGs
+        - JobName: !Ref JobSapInvGs
+        - JobName: !Ref JobSapDelGs
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_ord_inv_del_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  SalesAnalysisCasTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref JobSapOrdGs
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobSapInvGs
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+          - JobName: !Ref JobSapDelGs
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow salesanalysis cas Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref JobCasGs
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_cas_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  SalesAnalysisHetl2Trigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref JobCasGs
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow salesanalysis hetl2 Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref JobSalesAnalysisHetl2Gs
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_sales_analysis_hetl_2_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+
+  SalesAnalysisHetl3PfDetailTrigger:
+    Type: AWS::Glue::Trigger
+    Properties:
+      Type: CONDITIONAL
+      Predicate:
+        Conditions:
+          - JobName: !Ref JobSalesAnalysisHetl2Gs
+            LogicalOperator: EQUALS
+            State: SUCCEEDED
+        Logical: AND
+      Description: "Workflow salesanalysis hetl3 Trigger"
+      StartOnCreation: true
+      Actions:
+        - JobName: !Ref JobSalesAnalysisHetl3Gs
+        - JobName: !Ref JobPortfolioDetailGs
+      Name: !Sub '${Domain}_${DataProduct}_${Environment}_sales_analysis_hetl_3_pf_trigger'
+      WorkflowName: !Sub "dp-${Domain}-${DataProduct}-glue-workflow-${Environment}"
+      Tags:
+        Supplier: "Spindox"
+

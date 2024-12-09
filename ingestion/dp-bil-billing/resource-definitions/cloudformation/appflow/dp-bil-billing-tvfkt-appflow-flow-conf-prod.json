@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tvfkt",
+        "DomainName": "bil",
+        "SourceName": "sap",
+        "SourceObject": "i-billingdocumenttypetext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "bil-sap-tst-prd-raw-i-billingdocumenttypetext-tvfkt",
+        "Object": "/sap/opu/odata/sap/ZAWS_BILLING_DOCUMENT_SRV/I_BillingDocumentTypeText",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(1 1 ? * * *)"
+    }
+}

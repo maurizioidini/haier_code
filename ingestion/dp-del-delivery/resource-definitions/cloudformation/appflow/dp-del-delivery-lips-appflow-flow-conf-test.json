@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview lips",
+        "DomainName": "del",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-aws-i-delidocitem-cust",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "del-sap-tst-ing-raw-zww-otc-aws-i-delidocitem-cust-lips",
+        "Object": "/sap/opu/odata/sap/ZAWS_DELIVERYNOTE_SRV/ZWW_OTC_AWS_I_DeliDocItem_CUST",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)",
+        "IncrementalField": "LastChangeDate"
+    }
+}

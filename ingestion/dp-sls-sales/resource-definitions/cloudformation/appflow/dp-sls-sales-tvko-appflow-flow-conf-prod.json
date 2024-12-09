@@ -1,0 +1,19 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tvko",
+        "DomainName": "sls",
+        "SourceName": "sap",
+        "SourceObject": "zww-otc-i-salesorganization-tvko",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "sls-sales",
+        "Environment": "prd",
+        "BucketName": "data",
+        "Object": "/sap/opu/odata/sap/ZAWS_GENERAL_SRV/ZWW_OTC_I_SalesOrganization",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(45 1 ? * * *)"
+    }
+}
+

@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "dto",
+        "SourceDest": "qlk",
+        "Environment": "tst",
+        "Layer": "pro",
+        "DataType": "rel",
+        "Name": "reporting",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

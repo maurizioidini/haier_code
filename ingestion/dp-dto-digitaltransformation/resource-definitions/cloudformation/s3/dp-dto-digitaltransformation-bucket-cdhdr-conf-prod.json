@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "dto",
+        "SourceDest": "sap",
+        "Environment": "prd",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "i-dfs-orglmeasurechangedoc-cdhdr",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

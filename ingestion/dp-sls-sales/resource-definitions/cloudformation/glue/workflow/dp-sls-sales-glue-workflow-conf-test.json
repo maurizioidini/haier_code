@@ -1,0 +1,53 @@
+{
+  "Parameters": {
+      "Domain": "sls",
+      "DataProduct": "sales",
+      "Environment": "test",
+      "ScheduleCron": "cron(30 3 ? * * *)",
+      "Job1" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-logarea-cds_raw_to_rel_sap_sls_ft_zww_otc_logarea_cds",
+      "Job2" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-vbbe_raw_to_rel_sap_sls_ft_zww_otc_vbbe",
+      "Job3" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-i-sddocmultlvlprocflow-vbfa_raw_to_rel_sap_sls_ft_zww_otc_i_sddocmultlvlprocflow_vbfa",
+      "Job4" : "sls_sap_from_sls-sap-tst-ing-raw-i-salesdocumentitem-vbap_raw_to_rel_sap_sls_ft_i_salesdocumentitem_vbap",
+      "Job5" : "sls_sap_from_sls-sap-tst-ing-raw-i-salesdocumentscheduleline-vbep_raw_to_rel_sap_sls_ft_i_salesdocumentscheduleline_vbep",
+      "Job6" : "sls_sap_from_sls-sap-tst-ing-raw-i-salesdocument-vbak_raw_to_rel_sap_sls_ft_i_salesdocument_vbak",
+      "Job7" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-but000_raw_to_rel_sap_dm_zww_otc_but000",
+      "Job8" : "sls_sap_from_sls-sap-tst-ing-raw-i-incotermsclassificationtext-tinct_raw_to_rel_sap_dm_i_incotermsclassificationtext_tinct",
+      "Job9" : "sls_sap_from_sls-sap-tst-ing-raw-zww-scp-t-plord-cds_raw_to_rel_sap_sls_ft_zww_scp_t_plord_cds",
+      "Job10" : "sls_sap_from_sls-sap-tst-ing-raw-zww-scp-t-slocla-cds_raw_to_rel_sap_sls_ft_zww_scp_t_slocla_cds",
+      "Job11" : "sls_sap_from_sls-sap-tst-ing-raw-i-salesdocumenttypetext-tvakt_raw_to_rel_sap_dm_i_salesdocumenttypetext_tvakt",
+      "Job12" : "sls_sap_from_sls-sap-tst-ing-raw-i-sddocumentreasontext-tvaut_raw_to_rel_sap_dm_i_sddocumentreasontext_tvaut",
+      "Job13" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-vbkd_raw_to_rel_sap_sls_ft_zww_otc_vbkd",
+      "Job14" : "sls_sap_from_sls-sap-tst-ing-raw-i-additionalcustomergroup3text-tvv3t_raw_to_rel_sap_dm_i_additionalcustomergroup3text_tvv3t",
+      "Job15" : "sls_sap_from_sls-sap-tst-ing-raw-i-additionalcustomergroup5text-tvv5t_raw_to_rel_sap_dm_i_additionalcustomergroup5text_tvv5t",
+      "Job16" : "sls_sap_from_sls-sap-tst-ing-raw-i-salesgrouptext-tvgrt_raw_to_rel_sap_dm_i_salesgrouptext_tvgrt",
+      "Job17" : "sls_sap_from_sls-sap-tst-ing-raw-zww-cat-i-domainfixedvaluetext-dd07t_raw_to_rel_sap_dm_zww_cat_i_domainfixedvaluetext_dd07t",
+      "Job18" : "sls_sap_from_sls-sap-tst-ing-raw-i-customerpurchaseordertypetxt-t176t_raw_to_rel_sap_dm_i_customerpurchaseordertypetxt_t176t",
+      "Job19" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-tvst_raw_to_rel_sap_dm_zww_otc_tvst",
+      "Job20" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-twst_raw_to_rel_sap_dm_zww_otc_twst",
+      "Job21" : "sls_sap_from_sls-sap-tst-ing-raw-zww-ftm-i-taxcode-t007a_raw_to_rel_sap_dm_zww_ftm_i_taxcode_t007a",
+      "Job22" : "sls_sap_from_sls-sap-tst-ing-raw-i-taxcodetext-t007s_raw_to_rel_sap_dm_i_taxcodetext_t007s",
+      "Job23" : "sls_sap_from_sls-sap-tst-ing-raw-i-paymentmethoddescription-t042zt_raw_to_rel_sap_dm_i_paymentmethoddescription_t042zt",
+      "Job24" : "sls_sap_from_sls-sap-tst-ing-raw-zww-ftm-i-paymentterms-t052_raw_to_rel_sap_dm_zww_ftm_i_paymentterms_t052",
+      "Job25" : "sls_sap_from_sls-sap-tst-ing-raw-i-paymenttermsconditionstext-t052u_raw_to_rel_sap_dm_i_paymenttermsconditionstext_t052u",
+      "Job26" : "sls_sap_from_sls-sap-tst-ing-raw-i-exchangeraterawdata-tcurr_raw_to_rel_sap_dm_i_exchangeraterawdata_tcurr",
+      "Job27" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-aws-sdcompp-cust-sod-vbpa_raw_to_rel_sap_sls_ft_zww_otc_aws_sdcompp_cust_sod_vbpa",
+      "Job28" : "sls_sap_from_sls-sap-tst-ing-raw-i-customer-kna1_raw_to_rel_sap_dm_i_customer_kna1",
+      "Job29" : "sls_sap_from_sls-sap-tst-ing-raw-zww-ptp-knvv_raw_to_rel_sap_dm_zww_ptp_knvv",
+      "Job30" : "sls_sap_from_sls-sap-tst-ing-raw-i-salesdocumenttype-tvak_raw_to_rel_sap_dm_i_salesdocumenttype_tvak",
+      "Job31" : "sls_sap_from_sls-sap-tst-ing-raw-mapping-return-reasons_raw_to_rel_qlk_sls_mapping_return_reasons",
+      "Job32" : "sls_sap_from_sls-sap-tst-ing-raw-mapping-sales-office-network-uk_raw_to_rel_qlk_sls_mapping_sales_office_network_uk",
+      "Job33" : "sls_sap_from_zww-otc-i-salesorganization-tvko_raw_to_rel_sap_sls_ft_zww_otc_i_salesorganization_tvko",
+      "Job34" : "sls_sap_from_zww-otc-i-salesoffice-tvbur_raw_to_rel_sap_sls_ft_zww_otc_i_salesoffice_tvbur",
+      "Job35" : "sls_sap_from_i-storagelocation_raw_to_rel_sap_dm_i_storagelocation_t001l",
+      "Job36" : "sls_sap_from_zww-ptp-aws-i-prodstorloc-cust_raw_to_rel_sap_sls_ft_zww_ptp_aws_i_prodstorloc_cust_mard",
+      "JobPrcdHeader" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-v-konv-cust-so-header-prcd-elements_raw_to_rel_sap_sls_ft_zww_otc_v_konv_cust_so_header_prcd_elements",
+      "JobPrcdItem" : "sls_sap_from_sls-sap-tst-ing-raw-zww-otc-v-konv-cust-so-item-prcd-elements_raw_to_rel_sap_sls_ft_zww_otc_v_konv_cust_so_item_prcd_elements",
+      "JobPrcdInv" : "sls_sap_from_zww-otc-v-konv-cust-so-inv-prcd-elements_raw_to_rel_sap_sls_ft_zww_otc_v_konv_cust_so_inv_prcd_elements",
+      "JobPrcdBd" : "sls_sap_from_zww-otc-v-konv-cust-so-bd-prcd-elements_raw_to_rel_sap_sls_ft_zww_otc_v_konv_cust_so_bd_prcd_elements"
+    }
+}
+
+
+
+
+

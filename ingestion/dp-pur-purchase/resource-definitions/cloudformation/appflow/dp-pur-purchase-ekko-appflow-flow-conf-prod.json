@@ -1,0 +1,18 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview ekko",
+        "DomainName": "pur",
+        "SourceName": "sap",
+        "SourceObject": "i-purchasingdocument-ekko",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "DataProduct" : "pur-purchase",
+        "Environment": "prd",
+        "BucketName": "data",
+        "Object": "/sap/opu/odata/sap/ZAWS_PURCHASEORDERS_SRV/I_PurchasingDocument",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

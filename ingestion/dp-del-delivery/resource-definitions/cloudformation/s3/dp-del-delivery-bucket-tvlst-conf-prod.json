@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "del",
+        "SourceDest": "sap",
+        "Environment": "prd",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "i-deliveryblockreasontext-tvlst",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}

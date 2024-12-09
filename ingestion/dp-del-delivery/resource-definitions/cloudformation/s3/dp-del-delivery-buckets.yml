@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+# name
+  Domain:
+    Type: String
+    AllowedValues: [afs, bil, cst, cuc, del, dto, fin, hre, iot, mat, pla, pro, pur, sls]
+  SourceDest:
+    Type: String
+    AllowedValues: [ago, cpm, hqd, hon, scp, qlk, slf, sap, tms, sno, sie]
+  Environment:
+    Type: String
+    AllowedValues: [prd, dev, tst]
+  Layer:
+    Type: String
+    AllowedValues: [ing, pro, rea]
+    ConstraintDescription: Insert ing for ingress, pro for process, rea for readable
+  DataType:
+    Type: String
+    AllowedValues: [odm, raw, rel]
+  Name:
+    Type: String
+# lifecycling
+  IntelligentTieringEnabled:
+    Type: String
+    AllowedValues: [true, false]
+    Default: true
+  Days:
+    Type: Number
+    Default: 120
+
+Conditions:
+  EnableIntelligentTiering: !Equals [!Ref IntelligentTieringEnabled, 'true']
+
+Mappings:
+  EnvMap:
+    tst:
+      Role: 'arn:aws:iam::592141405271:role/svc-cloudformation-role-test'
+    prd:
+      Role: 'arn:aws:iam::975942111920:role/svc-cloudformation-role-prod'
+
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: RetainExceptOnCreate
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub '${Domain}-${SourceDest}-${Environment}-${Layer}-${DataType}-${Name}'
+      IntelligentTieringConfigurations:
+        !If
+        - EnableIntelligentTiering
+        - - Id: IntelligentTieringConfiguration
+            Status: Enabled
+            Tierings:
+              - AccessTier: ARCHIVE_ACCESS
+                Days: !Ref Days
+        - !Ref "AWS::NoValue"
+
+  BucketPolicy:
+   Type: AWS::S3::BucketPolicy
+   Properties:
+     Bucket: !Ref Bucket
+     PolicyDocument:
+       Version: "2012-10-17"
+       Statement:
+         - Effect: "Allow"
+           Principal:
+             Service: "appflow.amazonaws.com"
+           Action:
+             - "s3:PutObject"
+             - "s3:GetBucketAcl"
+             - "s3:PutObjectAcl"
+           Resource:
+             - !Sub 'arn:aws:s3:::${Domain}-${SourceDest}-${Environment}-${Layer}-${DataType}-${Name}'
+             - !Sub 'arn:aws:s3:::${Domain}-${SourceDest}-${Environment}-${Layer}-${DataType}-${Name}/*'

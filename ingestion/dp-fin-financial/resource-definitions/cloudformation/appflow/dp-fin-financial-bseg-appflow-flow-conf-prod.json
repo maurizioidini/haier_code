@@ -1,0 +1,17 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview bseg",
+        "DomainName": "fin",
+        "SourceName": "sap",
+        "SourceObject": "zww-ftm-bseg",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "fin-sap-prd-ing-raw-zww-ftm-bseg",
+        "Object": "/sap/opu/odata/sap/ZAWS_ACCOUNTING_SRV/ZWW_FTM_BSEG",
+        "ConnectorProfileName": "SAP_HEP",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 2 ? * * *)",
+        "IncrementalField": "ChangeDate"
+    }
+}

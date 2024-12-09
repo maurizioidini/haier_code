@@ -1,0 +1,11 @@
+{
+  "Parameters": {
+      "Domain": "bil",
+      "DataProduct": "billing",
+      "Environment": "test",
+      "ScheduleCron": "cron(0 4 ? * * *)",
+      "Job1" : "bil_sap_from_bil-sap-tst-ing-raw-i-billingdocumenttypetext-tvfkt_raw_to_rel_sap_dm_i_billingdocumenttypetext_tvfkt",
+      "Job2" : "bil_sap_from_bil-sap-tst-ing-raw-i-billingdocumentitem-vbrp_raw_to_rel_sap_bil_ft_i_billingdocumentitem_vbrp",
+      "Job3" : "bil_sap_from_bil-sap-tst-ing-raw-i-billingdocument-vbrk_raw_to_rel_sap_bil_ft_i_billingdocument_vbrk"
+  }
+}

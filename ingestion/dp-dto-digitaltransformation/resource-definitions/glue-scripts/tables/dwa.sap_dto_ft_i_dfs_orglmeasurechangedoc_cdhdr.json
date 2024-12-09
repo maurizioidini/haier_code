@@ -1,0 +1,82 @@
+{
+    "Name": "dwa.sap_dto_ft_i_dfs_orglmeasurechangedoc_cdhdr",
+    "Description": "Change document header (CDHDR)",
+    "PrimaryKey": [
+        "changedocobjectclass",
+        "changedocobject",
+        "changedocument"
+    ],
+    "SortKey": [
+        "changedocobjectclass",
+        "changedocobject",
+        "changedocument"
+    ],
+    "Column": [
+        {
+            "Name": "creationdate",
+            "Type": "TIMESTAMP",
+            "Comment": "",
+            "Encode": "AZ64"
+        },
+        {
+            "Name": "changedocobject",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocobjectclass",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocument",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "createdbyuser",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "creationtime",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changetransactioncode",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedocchangetype",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "changedoclanguage",
+            "Type": "VARCHAR(MAX)",
+            "Comment": "",
+            "Encode": "LZO"
+        },
+        {
+            "Name": "ingestion_date",
+            "Type": "datetime",
+            "Comment": "",
+            "Encode": "AZ64"
+        },
+        {
+            "Name": "end_validity_date",
+            "Type": "datetime",
+            "Comment": "",
+            "Encode": "AZ64"
+        }
+    ]
+}

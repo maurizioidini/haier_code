@@ -1,0 +1,6 @@
+{
+    "Parameters": {
+        "Name": "qlik-reporting",
+        "Environment": "prod"
+    }
+}

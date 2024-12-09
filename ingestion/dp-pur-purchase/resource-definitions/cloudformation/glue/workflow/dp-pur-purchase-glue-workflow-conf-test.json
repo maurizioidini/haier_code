@@ -1,0 +1,13 @@
+{
+  "Parameters": {
+      "Domain": "pur",
+      "DataProduct": "purchase",
+      "Environment": "test",
+      "ScheduleCron": "cron(30 4 ? * * *)",
+      "Job1" : "pur_sap_from_pur-sap-tst-ing-raw-i-shippingtypetext-t173t_raw_to_rel_sap_dm_i_shippingtypetext_t173t",
+      "Job2" : "pur_sap_from_pur-sap-tst-ing-raw-i-supplier-lfa1_raw_to_rel_sap_dm_i_supplier_lfa1",
+      "Job3" : "pur_sap_from_zww-ptp-aws-i-purcordhisbasic-cust_raw_to_rel_sap_pur_ft_zww_aws_i_purcordhisbasic_cust_ekbe",
+      "Job4" : "pur_sap_from_i-purchasingdocument-ekko_raw_to_rel_sap_pur_ft_i_purchasingdocument_ekko",
+      "Job5" : "pur_sap_from_zww-ptp-aws-i-purdocitem-cust_raw_to_rel_sap_pur_ft_zww_ptp_aws_i_purcdocitem_cust_ekpo"
+  }
+}

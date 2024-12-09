@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "FlowDescription": "Ingestion flow for cdsview tvlkt",
+        "DomainName": "del",
+        "SourceName": "sap",
+        "SourceObject": "i-deliverydocumenttypetext",
+        "ServiceName": "s3",
+        "LayerName": "ing",
+        "BucketName": "del-sap-tst-ing-raw-i-deliverydocumenttypetext-tvlkt",
+        "Object": "/sap/opu/odata/sap/ZAWS_DELIVERY_SRV/I_DeliveryDocumentTypeText",
+        "ConnectorProfileName": "Sap_Het",
+        "ConnectionType": "SAPOData",
+        "DataTransferApi": "",
+        "ScheduleCron": "cron(0 1 ? * * *)"
+    }
+}

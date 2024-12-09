@@ -1,0 +1,15 @@
+{
+    "Parameters": {
+        "Domain": "mat",
+        "SourceDest": "sap",
+        "Environment": "prd",
+        "Layer": "ing",
+        "DataType": "raw",
+        "Name": "zww-ptp-nsdm-e-mardh",
+        "IntelligentTieringEnabled": "true",
+        "Days": "150"
+    },
+    "Tags": {
+        "Supplier": "Spindox"
+    }
+}
